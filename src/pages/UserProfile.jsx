@@ -2,19 +2,47 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { Button } from "@/components/ui/button";
 import API from "../utils/api";
+// import { useNavigate } from "react-router-dom";
+import { Skeleton } from "@/components/ui/skeleton";
+import FreelancerForm from "../components/FreelancerForm";
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [freelancerDetails, setFreelancerDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
+    const parsedUser = JSON.parse(storedUser); // Parse the stored user object
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      setUser(parsedUser);
+    }
+    if (parsedUser.role === "freelancer") {
+      fetchFreelancerDetails(); // Fetch freelancer details for freelancers only
     }
   }, []);
+
+  const fetchFreelancerDetails = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await API.get("/freelancers");
+      setFreelancerDetails(res.data);
+    } catch (err) {
+      if (err.response && err.response.status === 404) {
+        // Profile not found — user hasn't created it yet
+        setFreelancerDetails(null);
+        setError(null);
+      } else {
+        console.error(err);
+        setError("Failed to fetch freelancer details");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div>
@@ -40,7 +68,6 @@ const UserProfile = () => {
             </Button>
           </div>
         </div>
-        
 
         {/* Right Side */}
         <div className="right w-3/4 bg-white rounded-2xl shadow-lg p-6">
@@ -48,15 +75,19 @@ const UserProfile = () => {
             <h2 className="text-2xl font-bold text-gray-800">
               Profile Details
             </h2>
-            <Button className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
-              Update Details
+            <Button
+              onClick={() => setIsEditing(true)}
+              className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+            >
+              Edit Profile
             </Button>
           </div>
 
           {loading && (
-            <div className="flex justify-center items-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
-              <span className="ml-2 text-gray-600">Loading...</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 py-4">
+              {[...Array(3)].map((_, index) => (
+                <Skeleton key={index} />
+              ))}
             </div>
           )}
 
@@ -68,7 +99,7 @@ const UserProfile = () => {
 
           {user?.role === "freelancer" ? (
             freelancerDetails ? (
-              <div className="space-y-6">
+              <div className="space-y-2">
                 {/* Bio Section */}
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h3 className="text-lg font-semibold text-gray-800 mb-3">
@@ -116,25 +147,10 @@ const UserProfile = () => {
                   <h3 className="text-lg font-semibold text-gray-800 mb-3">
                     Experience
                   </h3>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-green-600">
-                        {freelancerDetails.orders || 0}
-                      </p>
-                      <p className="text-gray-600 text-sm">Orders Completed</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-green-600">
-                        {freelancerDetails.reviews || 0}
-                      </p>
-                      <p className="text-gray-600 text-sm">Reviews</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-green-600">
-                        {freelancerDetails.rating || 0}
-                      </p>
-                      <p className="text-gray-600 text-sm">Rating</p>
-                    </div>
+                  <div>
+                    <p className="text-gray-700">
+                      {freelancerDetails.experience || "No experience specified"}
+                    </p>
                   </div>
                 </div>
 
@@ -171,6 +187,12 @@ const UserProfile = () => {
           )}
         </div>
       </div>
+      <FreelancerForm
+        open={isEditing}
+        onOpenChange={setIsEditing}
+        freelancer={freelancerDetails}
+        onSave={() => fetchFreelancerDetails()}
+      />
     </div>
   );
 };
