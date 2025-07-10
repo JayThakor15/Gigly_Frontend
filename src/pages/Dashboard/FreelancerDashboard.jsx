@@ -1,10 +1,10 @@
-import Navbar from "../components/Navbar";
+import Navbar from "../../components/Navbar";
 import React, { useEffect } from "react";
 import { WritingText } from "@/components/animate-ui/text/writing";
-import Freelancers from "../components/Freelancers";
-import Footer from "../components/Footer";
-import { useNavigate } from "react-router-dom"; 
-
+import Freelancers from "../../components/Freelancers";
+import Footer from "../../components/Footer";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const categories = [
   { name: "Web Developer", icon: "💻" },
@@ -13,16 +13,23 @@ const categories = [
   { name: "Content Writer", icon: "✍️" },
 ];
 
-const Dashboard = () => {
+const FreelancerDashboard = () => {
   const navigate = useNavigate(); // Import useNavigate from react-router-dom
+  const [user, setuser] = useState(null);
+  console.log(user);
+  
 
   // Add useEffect to check for token
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const userString = localStorage.getItem("user");
+    if (userString) {
+      setuser(JSON.parse(userString));
+    }
     if (!token) {
       navigate("/"); // Redirect to login or home page if no token found.
     }
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="relative min-h-screen">
@@ -35,15 +42,14 @@ const Dashboard = () => {
             className="absolute inset-0 w-full h-full object-cover opacity-60 -z-10 rounded-2xl"
           />
           <div className="mt-32 md:mt-40 flex flex-col items-center w-full px-4">
+            <h1 className="text-4xl md:text-6xl font-bold text-white text-center drop-shadow-lg">
+             Hello {user?.username}, Welcome to Giglyy<span className="text-green-500">.</span>
+            </h1>
             <WritingText
-              className="text-5xl md:text-6xl font-extrabold text-white text-center drop-shadow-lg"
-              text="Your vision. Our freelancers."
+              className="text-sm mt-5 md:text-3xl font-medium text-white text-center drop-shadow-lg"
+              text="Your one-stop platform for finding and hiring top freelance talent."
               spacing={9}
             />
-            <p className="text-2xl md:text-3xl mt-6 text-white text-center font-medium drop-shadow">
-              Your one-stop platform for finding and hiring top freelance
-              talent.
-            </p>
             <div className="mt-8 w-full max-w-2xl">
               <form className="flex items-center bg-white/90 rounded-full shadow-lg px-4 py-2">
                 <span className="text-gray-400 text-2xl mr-2">🔍</span>
@@ -78,7 +84,7 @@ const Dashboard = () => {
                 Why choose Giglyy?
               </h3>
               <ul className="text-gray-700 text-lg space-y-2 text-center">
-                <li>✔️ 700+ categories to explore</li>
+                <li>✔️ 50+ categories to explore</li>
                 <li>✔️ Secure payments & trusted reviews</li>
                 <li>✔️ Connect with global talent instantly</li>
                 <li>✔️ 24/7 support for clients and freelancers</li>
@@ -89,10 +95,18 @@ const Dashboard = () => {
       </div>
       <div className="flex flex-col justify-center mt-5">
         <h1 className="text-4xl font-medium text-white mb-2 text-center">
-          Get it done with right Freelancer
+          Your Gigs
         </h1>
         <div className="mt-5 ">
           <Freelancers />
+        </div>
+        <div className="flex flex-col justify-center mt-5">
+          <h1 className="text-4xl font-medium text-white mb-2 text-center">
+            See what other freelancers are up to
+          </h1>
+          <div className="mt-5 ">
+            <Freelancers />
+          </div>
         </div>
       </div>
       <Footer />
@@ -100,4 +114,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default FreelancerDashboard;

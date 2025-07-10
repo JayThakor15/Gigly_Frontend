@@ -38,7 +38,7 @@ import {
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [onProfile, setonProfile] = useState(false)
+  const [onProfile, setonProfile] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -114,7 +114,9 @@ const Navbar = () => {
                         <DropdownMenuShortcut>⇧⌘H</DropdownMenuShortcut>
                       </DropdownMenuItem>
                     ) : (
-                      <DropdownMenuItem onClick={() => navigate("/userprofile")}>
+                      <DropdownMenuItem
+                        onClick={() => navigate("/userprofile")}
+                      >
                         <User className="mr-2 h-4 w-4" />
                         <span>Profile</span>
                         <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
@@ -126,6 +128,11 @@ const Navbar = () => {
                     <DropdownMenuItem>
                       <CreditCard className="mr-2 h-4 w-4" />
                       <span>Your Orders</span>
+                      <DropdownMenuShortcut>⌘O</DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/creategigs")}>
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      <span>My Gigs</span>
                       <DropdownMenuShortcut>⌘O</DropdownMenuShortcut>
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
