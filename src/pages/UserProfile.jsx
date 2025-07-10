@@ -40,6 +40,7 @@ const UserProfile = () => {
             </Button>
           </div>
         </div>
+        
 
         {/* Right Side */}
         <div className="right w-3/4 bg-white rounded-2xl shadow-lg p-6">
