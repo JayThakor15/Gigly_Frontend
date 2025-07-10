@@ -1,3 +1,5 @@
+import { useRef } from "react";
+
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { Button } from "@/components/ui/button";
@@ -12,6 +14,15 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -43,6 +54,30 @@ const UserProfile = () => {
       setLoading(false);
     }
   };
+  const handleImageUpload = async (file) => {
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    try {
+      setUploadingImage(true);
+      await API.post("/freelancers/upload-image", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${user?.token}`,
+        },
+      });
+
+      // Refresh freelancer details to get new avatar
+      fetchFreelancerDetails();
+    } catch (err) {
+      console.error("Image upload failed:", err);
+      alert("Failed to upload image. Please try again.");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   return (
     <div>
@@ -51,13 +86,30 @@ const UserProfile = () => {
         {/* Left Side */}
         <div className="left w-1/4 bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center justify-center gap-6">
           <img
-            src="https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg?semt=ais_hybrid&w=740"
+            src={
+              freelancerDetails?.avatar ||
+              "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg?semt=ais_hybrid&w=740"
+            }
             alt="Profile"
             className="w-48 h-48 rounded-full object-cover border-4 border-green-500 shadow-md"
           />
-          <Button className="w-full text-white font-semibold py-2 px-4 rounded-lg transition-colors">
-            Upload New Image
-          </Button>
+          <label className="w-full">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleImageUpload(e.target.files[0])}
+              className="hidden"
+              ref={fileInputRef} // Add ref to the input element
+            />
+            <Button
+              disabled={uploadingImage}
+              className="w-full text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+              onClick={handleButtonClick} // Add onClick handler to the button
+            >
+              {uploadingImage ? "Uploading..." : "Upload New Image"}
+            </Button>
+          </label>
+
           <div className="flex flex-col justify-center items-center">
             <h1 className="text-2xl font-bold">{user?.username}</h1>
             <p className="text-gray-600">{user?.email}</p>
@@ -149,7 +201,8 @@ const UserProfile = () => {
                   </h3>
                   <div>
                     <p className="text-gray-700">
-                      {freelancerDetails.experience || "No experience specified"}
+                      {freelancerDetails.experience ||
+                        "No experience specified"}
                     </p>
                   </div>
                 </div>
