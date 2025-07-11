@@ -6,6 +6,7 @@ import Footer from "../../components/Footer";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import MyGigs from "../../components/MyGigs";
+import OtherFreelancersGigs from "../../components/OtherFreelancersGigs";
 
 const categories = [
   { name: "Web Developer", icon: "💻" },
@@ -51,22 +52,7 @@ const FreelancerDashboard = () => {
               text="Your one-stop platform for finding and hiring top freelance talent."
               spacing={9}
             />
-            <div className="mt-8 w-full max-w-2xl">
-              <form className="flex items-center bg-white/90 rounded-full shadow-lg px-4 py-2">
-                <span className="text-gray-400 text-2xl mr-2">🔍</span>
-                <input
-                  type="text"
-                  placeholder="Search for services, skills, or freelancers..."
-                  className="flex-1 bg-transparent outline-none text-lg text-gray-700 placeholder-gray-400"
-                />
-                <button
-                  type="submit"
-                  className="ml-2 px-6 py-2 rounded-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold hover:from-green-600 hover:to-blue-600 transition"
-                >
-                  Search
-                </button>
-              </form>
-            </div>
+            
             <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-4xl">
               {categories.map((cat) => (
                 <div
@@ -106,7 +92,7 @@ const FreelancerDashboard = () => {
             See what other freelancers are up to
           </h1>
           <div className="mt-5 ">
-            <Freelancers />
+            <OtherFreelancersGigs />
           </div>
         </div>
       </div>

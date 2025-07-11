@@ -1,19 +1,15 @@
-import React, { useState, useEffect } from "react";
-
+import React from "react";
 import API from "../utils/api";
-
-
-const MyGigs = () => {
-  const [myGigs, setMyGigs] = useState([]);
+import { useState } from "react";
+import { useEffect } from "react";
+const OtherFreelancersGigs = () => {
+  const [otherFreelancersGigs, setOtherFreelancersGigs] = useState([]);
   const [loading, setLoading] = useState(true);
-
-
-  // Fetch my gigs on mount
-  const fetchMyGigs = async () => {
+  const fetchOthersGigs = async () => {
     setLoading(true);
     try {
-      const res = await API.get("/gigs/my-gigs");
-      setMyGigs(res.data);
+      const res = await API.get("/gigs/others");
+      setOtherFreelancersGigs(res.data);
       console.log(res.data);
     } catch (err) {
       console.error(err);
@@ -21,9 +17,8 @@ const MyGigs = () => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
-    fetchMyGigs();
+    fetchOthersGigs();
   }, []);
 
   return (
@@ -34,9 +29,9 @@ const MyGigs = () => {
             <div className="w-16 h-16 border-4 border-green-200 border-t-green-500 rounded-full animate-spin"></div>
             <p className="text-gray-600 text-lg mt-4">Loading your gigs...</p>
           </div>
-        ) : myGigs.length > 0 ? (
+        ) : otherFreelancersGigs.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 px-4">
-            {myGigs.map((gig) => (
+            {otherFreelancersGigs.map((gig) => (
               <div
                 key={gig._id}
                 className="group relative bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-100"
@@ -80,18 +75,16 @@ const MyGigs = () => {
         ) : (
           <div className="flex flex-col items-center justify-center h-96">
             <h3 className="text-2xl font-bold text-white mb-2">
-              No Gigs Found
+                No gigs found from other freelancers
             </h3>
             <p className="text-green-400 text-lg mb-6 max-w-md text-center">
-              Create your first gig to showcase your services!
+                It seems like there are no gigs available from other freelancers at the moment. Please check back later or explore other categories.
             </p>
           </div>
         )}
       </div>
-
-      
     </div>
   );
 };
 
-export default MyGigs;
+export default OtherFreelancersGigs;
