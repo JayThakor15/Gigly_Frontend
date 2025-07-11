@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import API from "../utils/api";
-
+import toast, { Toaster } from "react-hot-toast";
 const categories = [
   "Web Development",
   "UI/UX Design",
@@ -90,10 +90,11 @@ const GigsCreationForm = ({ open, onOpenChange, onSaved }) => {
         category: "",
         price: "",
       });
+      toast.success("Gig created successfully!");
       setThumbnail(null);
     } catch (err) {
       console.error(err);
-      alert("Failed to save gig. Please try again.");
+      toast.error("Failed to create gig. Please try again.");
     } finally {
       setLoading(false);
     }
