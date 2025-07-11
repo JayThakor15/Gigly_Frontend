@@ -6,7 +6,6 @@ import GigsForm from "../components/GigsCreationForm"; // Make sure you use the 
 import EditGigModal from "../components/EditGigModel";
 import toast, { Toaster } from "react-hot-toast";
 
-
 const GigsCreation = ({ open, onOpenChange, onSaved, gig }) => {
   const [gigs, setGigs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,7 +16,7 @@ const GigsCreation = ({ open, onOpenChange, onSaved, gig }) => {
   const fetchAllGigs = async () => {
     setLoading(true);
     try {
-      const res = await API.get("/gigs");
+      const res = await API.get("/gigs/my-gigs");
       setGigs(res.data);
     } catch (err) {
       console.error(err);

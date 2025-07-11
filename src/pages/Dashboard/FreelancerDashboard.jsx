@@ -5,6 +5,7 @@ import Freelancers from "../../components/Freelancers";
 import Footer from "../../components/Footer";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import MyGigs from "../../components/MyGigs";
 
 const categories = [
   { name: "Web Developer", icon: "💻" },
@@ -17,7 +18,6 @@ const FreelancerDashboard = () => {
   const navigate = useNavigate(); // Import useNavigate from react-router-dom
   const [user, setuser] = useState(null);
   console.log(user);
-  
 
   // Add useEffect to check for token
   useEffect(() => {
@@ -43,7 +43,8 @@ const FreelancerDashboard = () => {
           />
           <div className="mt-32 md:mt-40 flex flex-col items-center w-full px-4">
             <h1 className="text-4xl md:text-6xl font-bold text-white text-center drop-shadow-lg">
-             Hello {user?.username}, Welcome to Giglyy<span className="text-green-500">.</span>
+              Hello {user?.username}, Welcome to Giglyy
+              <span className="text-green-500">.</span>
             </h1>
             <WritingText
               className="text-sm mt-5 md:text-3xl font-medium text-white text-center drop-shadow-lg"
@@ -98,7 +99,7 @@ const FreelancerDashboard = () => {
           Your Gigs
         </h1>
         <div className="mt-5 ">
-          <Freelancers />
+          <MyGigs />
         </div>
         <div className="flex flex-col justify-center mt-5">
           <h1 className="text-4xl font-medium text-white mb-2 text-center">

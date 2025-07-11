@@ -2,7 +2,7 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
-@plugin "daisyui";
+@plugin "daisyui"
 
 /* Add to your index.css or global styles */
 .no-scrollbar::-webkit-scrollbar {
