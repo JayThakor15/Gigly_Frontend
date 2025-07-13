@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { MotionHighlight } from "@/components/animate-ui/effects/motion-highlight";
 import API from "../utils/api";
+import { Button } from "@/components/ui/button";
 
 const Freelancers = ({ searchQuery }) => {
   const [allgigs, setallgigs] = useState([]);
@@ -25,8 +26,6 @@ const Freelancers = ({ searchQuery }) => {
 
   useEffect(() => {
     if (!searchQuery) {
-      // If searchQuery is empty, reset filteredGigs to all gigs
-
       setFilteredGigs(allgigs);
       return;
     }
@@ -48,6 +47,15 @@ const Freelancers = ({ searchQuery }) => {
         <div className="flex flex-col items-center justify-center h-96 col-span-4">
           <div className="w-12 h-12 border-4 border-green-200 border-t-green-500 rounded-full animate-spin"></div>
           <p className="text-gray-600 text-lg mt-4">Loading your gigs...</p>
+        </div>
+      ) : filteredGigs.length === 0 ? (
+        <div className="flex flex-col rounded-2xl items-center justify-center h-96 col-span-4 bg-white">
+          <p className="text-black font-bold text-2xl">
+            No gigs found matching "{searchQuery}"
+          </p>
+          <p className="text-gray-500 text-sm mt-2">
+            Try searching for something else.
+          </p>
         </div>
       ) : (
         filteredGigs.map((gig) => {
@@ -129,6 +137,14 @@ const Freelancers = ({ searchQuery }) => {
                         ${gig.price}
                       </p>
                     </div>
+                  </div>
+                  <div>
+                    <Button
+                      className="mt-3 w-full hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                      onClick={() => (window.location.href = `/gig/${gig._id}`)}
+                    >
+                      View Gig
+                    </Button>
                   </div>
                 </div>
 

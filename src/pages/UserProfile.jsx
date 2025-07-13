@@ -231,11 +231,28 @@ const UserProfile = () => {
               )
             )
           ) : (
-            <div className="text-center py-8">
-              <p className="text-gray-500 text-lg">Client Profile</p>
-              <p className="text-gray-400 text-sm mt-2">
-                Additional profile features coming soon for clients
-              </p>
+            <div className="space-y-4">
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                  Name
+                </h3>
+                <p className="text-gray-700">{user?.username}</p>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                  Email
+                </h3>
+                <p className="text-gray-700">{user?.email}</p>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                  Orders
+                </h3>
+                <p className="text-gray-700">
+                  Coming soon! You'll see your orders here.
+                </p>
+              </div>
             </div>
           )}
         </div>

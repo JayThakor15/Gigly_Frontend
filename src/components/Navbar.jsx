@@ -41,9 +41,14 @@ const Navbar = () => {
   const [onProfile, setonProfile] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-
+  const [user, setUser] = useState(null);
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const userString = localStorage.getItem("user");
+    if (userString) {
+      setUser(JSON.parse(userString));
+    }
+
     setIsLoggedIn(!!token);
   }, []);
 
@@ -90,7 +95,7 @@ const Navbar = () => {
               Contact
             </a>
           </li>
-          {isLoggedIn ? (
+          {isLoggedIn && user?.role === "freelancer" ? (
             <li>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -133,6 +138,56 @@ const Navbar = () => {
                     <DropdownMenuItem onClick={() => navigate("/creategigs")}>
                       <PlusCircle className="mr-2 h-4 w-4" />
                       <span>My Gigs</span>
+                      <DropdownMenuShortcut>⌘O</DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Logout</span>
+                    <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </li>
+          ) : (isLoggedIn && user?.role === "client") ? (
+            <li>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" asChild>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <AnimateIcon animateOnHover>
+                        <UserRound />
+                      </AnimateIcon>
+                    </motion.button>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56">
+                  <DropdownMenuGroup>
+                    {onProfile ? (
+                      <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                        <Home className="mr-2 h-4 w-4" />
+                        <span>Home</span>
+                        <DropdownMenuShortcut>⇧⌘H</DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                    ) : (
+                      <DropdownMenuItem
+                        onClick={() => navigate("/userprofile")}
+                      >
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                        <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem>
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      <span>Your Orders</span>
                       <DropdownMenuShortcut>⌘O</DropdownMenuShortcut>
                     </DropdownMenuItem>
                   </DropdownMenuGroup>

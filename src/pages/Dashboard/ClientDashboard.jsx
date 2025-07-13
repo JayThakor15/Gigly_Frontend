@@ -4,9 +4,9 @@ import { WritingText } from "@/components/animate-ui/text/writing";
 import Freelancers from "../../components/Freelancers";
 import Footer from "../../components/Footer";
 import { useNavigate } from "react-router-dom";
-// import ProfileCard from "../../../component/ProfileCard/ProfileCard";
-
+import ProfileCard from "../../../component/ProfileCard/ProfileCard";
 import { useState } from "react";
+
 
 const categories = [
   { name: "Web Developer", icon: "💻" },
@@ -57,7 +57,9 @@ const ClientDashboard = () => {
                 onSubmit={(e) => {
                   e.preventDefault();
                   // Scroll to the Freelancers section on search
-                  const gigsSection = document.getElementById("freelancer-gigs-section");
+                  const gigsSection = document.getElementById(
+                    "freelancer-gigs-section"
+                  );
                   if (gigsSection) {
                     gigsSection.scrollIntoView({ behavior: "smooth" });
                   }
@@ -94,7 +96,10 @@ const ClientDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col justify-center mt-5" id="freelancer-gigs-section">
+      <div
+        className="flex flex-col justify-center mt-5"
+        id="freelancer-gigs-section"
+      >
         <h1 className="text-4xl font-medium text-white mb-2 text-center">
           Get it done with right Freelancer
         </h1>
@@ -173,7 +178,7 @@ const ClientDashboard = () => {
             </div>
 
             {/* Meet the Creator Section */}
-            {/* <ProfileCard
+            <ProfileCard
               name="Jay Thakor"
               title="Full Stack Developer"
               handle="jaythakor"
@@ -183,7 +188,7 @@ const ClientDashboard = () => {
               showUserInfo={true}
               enableTilt={true}
               onContactClick={() => console.log("Contact clicked")}
-            /> */}
+            />
           </div>
         </div>
       </div>
