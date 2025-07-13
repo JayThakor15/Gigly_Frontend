@@ -6,6 +6,7 @@ import ClientDashboard from './pages/Dashboard/ClientDashboard'
 import UserProfile from './pages/UserProfile'
 import FreelancerDashboard from './pages/Dashboard/FreelancerDashboard'
 import GigsCreation from './pages/GigsCreation'
+import RolebasedDashboard from './pages/Dashboard/RolebasedDashboard'
 
 function App() {
   
@@ -15,7 +16,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/dashboard" element={<FreelancerDashboard />} />
+          <Route path="/dashboard" element={<RolebasedDashboard />} />
           <Route path="/userprofile" element={<UserProfile />} />
           <Route path="/creategigs" element={<GigsCreation />} />
         </Routes>

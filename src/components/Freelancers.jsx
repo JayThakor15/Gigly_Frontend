@@ -1,180 +1,146 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { MotionHighlight } from "@/components/animate-ui/effects/motion-highlight";
+import API from "../utils/api";
 
-const FREELANCERS = [
-	{
-		name: "Rakesh Kumar",
-		badge: "Top Rated",
-		badgeIcon: "◆◆◆",
-		language: "English",
-		description:
-			"We are a top AI, Web & Mobile App Development Agency with 5+ years of experience.",
-		skills: [
-			"Node.js",
-			"React",
-			"JavaScript",
-			"User experience design",
-			"+ 25",
-		],
-		avatar: "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg?semt=ais_hybrid&w=740", // Replace with your avatar image path
-		reviews: 92,
-		rating: 4.7,
-		orders: 139,
-	},
-    {
-		name: "Ankita Shukla",
-		badge: "Top Rated",
-		badgeIcon: "◆◆◆",
-		language: "English",
-		description:
-			"We are a top AI, Web & Mobile App Development Agency with 5+ years of experience.",
-		skills: [
-			"Node.js",
-			"React",
-			"JavaScript",
-			"User experience design",
-			"+ 25",
-		],
-		avatar: "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg?semt=ais_hybrid&w=740", // Replace with your avatar image path
-		reviews: 92,
-		rating: 4.7,
-		orders: 139,
-	},
-    {
-		name: "Himanshi Singh",
-		badge: "Top Rated",
-		badgeIcon: "◆◆◆",
-		language: "English",
-		description:
-            "We are a top AI, Web & Mobile App Development Agency with 5+ years of experience.",
-		skills: [
-			"Node.js",
-			"React",
-			"JavaScript",
-			"User experience design",
-			"+ 25",
-		],
-		avatar: "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg?semt=ais_hybrid&w=740", // Replace with your avatar image path
-		reviews: 92,
-		rating: 4.7,
-		orders: 112,
-	},
-	{
-		name: "Priya Sharma",
-		badge: "Rising Talent",
-		badgeIcon: "◆",
-		language: "English, Hindi",
-		description:
-			"Creative UI/UX designer with a passion for crafting intuitive and visually appealing digital experiences.",
-		skills: ["Figma", "Adobe XD", "User Research", "Wireframing", "+ 10"],
-		avatar: "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg?semt=ais_hybrid&w=740",
-		reviews: 15,
-		rating: 4.9,
-		orders: 20,
-	},
-	{
-		name: "Amit Patel",
-		badge: "Level Two",
-		badgeIcon: "◆◆",
-		language: "English",
-		description:
-			"I write compelling and SEO-optimized content that engages readers and drives traffic.",
-		skills: ["Content Writing", "SEO", "Copywriting", "Blogging", "+ 15"],
-		avatar: "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg?semt=ais_hybrid&w=740",
-		reviews: 45,
-		rating: 4.8,
-		orders: 78,
-	},
-	{
-		name: "Sneha Reddy",
-		badge: "Top Rated",
-		badgeIcon: "◆◆◆",
-		language: "English, Telugu",
-		description:
-			"Professional video editor turning raw footage into cinematic stories. Let's create something amazing.",
-		skills: [
-			"Premiere Pro",
-			"After Effects",
-			"Color Grading",
-			"Motion Graphics",
-			"+ 8",
-		],
-		avatar: "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg?semt=ais_hybrid&w=740",
-		reviews: 150,
-		rating: 5.0,
-		orders: 210,
+const Freelancers = ({ searchQuery }) => {
+  const [allgigs, setallgigs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filteredGigs, setFilteredGigs] = useState([]);
+
+  useEffect(() => {
+    const fetchAllGigs = async () => {
+      try {
+        const res = await API.get("/gigs");
+        setallgigs(res.data);
+        setFilteredGigs(res.data);
+      } catch (error) {
+        console.log("Error fetching gigs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllGigs();
+  }, []);
+
+  useEffect(() => {
+    if (!searchQuery) {
+      // If searchQuery is empty, reset filteredGigs to all gigs
+
+      setFilteredGigs(allgigs);
+      return;
     }
-];
 
-const Freelancers = () => {
-	return (
-		<div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-6">
-			{FREELANCERS.map((f, idx) => (
-				<MotionHighlight key={idx} hover className="rounded-2xl">
-					<div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 flex flex-col items-start max-w-md mx-auto">
-						<div className="flex items-center gap-4 w-full">
-							<img
-								src={f.avatar}
-								alt={f.name}
-								className="w-16 h-16 rounded-full object-cover border-2 border-green-400"
-							/>
-							<div>
-								<div className="flex items-center gap-2">
-									<span className="text-xl font-bold text-gray-900">
-										{f.name}
-									</span>
-									<span className="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-1 rounded flex items-center gap-1">
-										{f.badge}{" "}
-										<span className="text-xs">{f.badgeIcon}</span>
-									</span>
-								</div>
-								<div className="text-gray-500 text-sm">
-									{f.language}
-								</div>
-							</div>
-						</div>
-						<div className="mt-3 text-gray-700 text-base line-clamp-2">
-							{f.description}
-						</div>
-						<div className="flex flex-wrap gap-2 mt-4">
-							{f.skills.map((skill, i) => (
-								<span
-									key={i}
-									className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium"
-								>
-									{skill}
-								</span>
-							))}
-						</div>
-						<div className="flex items-center justify-between w-full mt-6 pt-4 border-t">
-							<div className="flex flex-col items-center">
-								<span className="text-xs text-gray-500">Reviews</span>
-								<span className="flex items-center gap-1 font-semibold text-gray-800">
-									<svg
-										className="w-4 h-4 text-yellow-500"
-										fill="currentColor"
-										viewBox="0 0 20 20"
-									>
-										<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.18c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.18a1 1 0 00.95-.69l1.286-3.967z" />
-									</svg>
-									{f.rating}
-								</span>
-								<span className="text-xs text-gray-500">
-									{f.reviews} Reviews
-								</span>
-							</div>
-							<div className="flex flex-col items-center">
-								<span className="text-xs text-gray-500">Orders</span>
-								<span className="font-bold text-gray-800">
-									{f.orders}
-								</span>
-							</div>
-						</div>
-					</div>
-				</MotionHighlight>
-			))}
-		</div>
-	);
+    const lower = searchQuery.toLowerCase();
+    const filtered = allgigs.filter(
+      (gig) =>
+        gig.title?.toLowerCase().includes(lower) ||
+        gig.description?.toLowerCase().includes(lower) ||
+        gig.category?.toLowerCase().includes(lower)
+    );
+
+    setFilteredGigs(filtered);
+  }, [searchQuery, allgigs]);
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mt-10 px-2">
+      {loading ? (
+        <div className="flex flex-col items-center justify-center h-96 col-span-4">
+          <div className="w-12 h-12 border-4 border-green-200 border-t-green-500 rounded-full animate-spin"></div>
+          <p className="text-gray-600 text-lg mt-4">Loading your gigs...</p>
+        </div>
+      ) : (
+        filteredGigs.map((gig) => {
+          const avatarUrl =
+            gig.freelancerId &&
+            typeof gig.freelancerId === "object" &&
+            gig.freelancerId.avatar
+              ? gig.freelancerId.avatar
+              : "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg?semt=ais_hybrid&w=740";
+
+          const username =
+            gig.userId && typeof gig.userId === "object" && gig.userId.username
+              ? gig.userId.username
+              : "Unknown User";
+
+          return (
+            <MotionHighlight key={gig._id} hover className="rounded-xl">
+              <div
+                className="group relative bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-gray-100 min-h-[320px] max-w-xs mx-auto"
+                style={{ width: "100%" }}
+              >
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-green-400/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
+
+                {/* Gig Thumbnail with Overlay */}
+                <div className="relative overflow-hidden">
+                  <img
+                    src={
+                      gig.thumbnail ||
+                      "https://via.placeholder.com/400x240/f3f4f6/9ca3af?text=No+Image"
+                    }
+                    alt={gig.title}
+                    className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  {/* Price Badge */}
+                  <div className="absolute top-2 right-2 bg-white text-black px-2 py-0.5 rounded-full text-xs font-bold shadow">
+                    ${gig.price}
+                  </div>
+                  {/* Category Badge */}
+                  {gig.category && (
+                    <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-gray-700 px-2 py-0.5 rounded-full text-xs font-medium shadow">
+                      {gig.category}
+                    </div>
+                  )}
+                </div>
+
+                {/* Card Content */}
+                <div className="p-3 relative z-20">
+                  {/* User Info */}
+                  <div className="flex items-center gap-2 mb-2">
+                    <img
+                      src={avatarUrl}
+                      alt={username}
+                      className="w-8 h-8 rounded-full object-cover border shadow"
+                    />
+                    <div>
+                      <p className="text-gray-800 font-semibold text-xs">
+                        {username}
+                      </p>
+                      <p className="text-gray-500 text-[10px]">Freelancer</p>
+                    </div>
+                  </div>
+
+                  {/* Gig Title */}
+                  <h3 className="text-base font-bold text-gray-800 line-clamp-2 group-hover:text-green-600 transition-colors duration-300">
+                    {gig.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="text-gray-600 text-xs line-clamp-2 leading-snug mt-1">
+                    {gig.description}
+                  </p>
+
+                  {/* Footer */}
+                  <div className="flex items-center justify-between pt-2 border-t border-gray-100 mt-2">
+                    <div className="text-right">
+                      <p className="text-[10px] text-gray-500">Starting at</p>
+                      <p className="text-base font-bold text-black">
+                        ${gig.price}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Hover Effect Border */}
+                <div className="absolute inset-0 border-2 border-green-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+            </MotionHighlight>
+          );
+        })
+      )}
+    </div>
+  );
 };
 
 export default Freelancers;

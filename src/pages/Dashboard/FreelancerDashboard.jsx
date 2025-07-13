@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import MyGigs from "../../components/MyGigs";
 import OtherFreelancersGigs from "../../components/OtherFreelancersGigs";
+import SplitText from "../../../component/SplitText/SplitText"; // Make sure this import is correct
 
 const categories = [
   { name: "Web Developer", icon: "💻" },
@@ -43,16 +44,27 @@ const FreelancerDashboard = () => {
             className="absolute inset-0 w-full h-full object-cover opacity-60 -z-10 rounded-2xl"
           />
           <div className="mt-32 md:mt-40 flex flex-col items-center w-full px-4">
-            <h1 className="text-4xl md:text-6xl font-bold text-white text-center drop-shadow-lg">
-              Hello {user?.username}, Welcome to Giglyy
-              <span className="text-green-500">.</span>
-            </h1>
+            <h3 className="text-2xl md:text-4xl font-bold text-white text-center drop-shadow-lg">Hello {user?.username}</h3>
+            {/* Animated User Welcome */}
+            <SplitText
+              text={`Welcome to Giglyy.`}
+              className="text-4xl md:text-6xl font-extrabold text-white text-center drop-shadow-lg"
+              delay={80}
+              duration={0.6}
+              splitType="chars"
+              from={{ opacity: 0, y: 40 }}
+              to={{ opacity: 1, y: 0 }}
+              threshold={0.1}
+              rootMargin="-100px"
+              textAlign="center"
+              
+            />
             <WritingText
-              className="text-sm mt-5 md:text-3xl font-medium text-white text-center drop-shadow-lg"
+              className="text-base mt-2 md:text-2xl font-medium text-white text-center drop-shadow-lg"
               text="Your one-stop platform for finding and hiring top freelance talent."
               spacing={9}
             />
-            
+
             <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-4xl">
               {categories.map((cat) => (
                 <div
