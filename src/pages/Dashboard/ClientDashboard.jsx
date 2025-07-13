@@ -9,10 +9,10 @@ import { useState } from "react";
 
 
 const categories = [
-  { name: "Web Developer", icon: "💻" },
-  { name: "UI/UX Designer", icon: "🎨" },
-  { name: "Video Editor", icon: "🎬" },
-  { name: "Content Writer", icon: "✍️" },
+  { name: "Web Development", icon: "💻" },
+  { name: "UI/UX Designing", icon: "🎨" },
+  { name: "Video Editing", icon: "🎬" },
+  { name: "Content Writing", icon: "✍️" },
 ];
 
 const ClientDashboard = () => {
@@ -115,6 +115,15 @@ const ClientDashboard = () => {
               <div
                 key={cat.name}
                 className="group cursor-pointer rounded-2xl bg-white/90 backdrop-blur-sm p-6 text-center shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-gray-200/50"
+                onClick={() => {
+                  setSearchQuery(cat.name); // Set search query to category name
+                  // Optionally scroll to gigs section
+                  const gigsSection = document.getElementById("freelancer-gigs-section");
+                  if (gigsSection) {
+                    gigsSection.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+                style={{ userSelect: "none" }}
               >
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-green-300 to-blue-100 mx-auto mb-4 transition-all duration-300 group-hover:scale-110 group-hover:shadow-md">
                   <span className="text-4xl">{cat.icon}</span>
