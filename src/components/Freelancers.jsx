@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import { MotionHighlight } from "@/components/animate-ui/effects/motion-highlight";
 import API from "../utils/api";
 import { Button } from "@/components/ui/button";
+import GigsDetailModal from "./GigsDetailModal";
 
 const Freelancers = ({ searchQuery }) => {
   const [allgigs, setallgigs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filteredGigs, setFilteredGigs] = useState([]);
+  const [selectedGig, setSelectedGig] = useState(null);
+  const [isModelOpen, setIsModelOpen] = useState(false);
 
   useEffect(() => {
     const fetchAllGigs = async () => {
@@ -141,7 +144,10 @@ const Freelancers = ({ searchQuery }) => {
                   <div>
                     <Button
                       className="mt-3 w-full hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
-                      onClick={() => (window.location.href = `/gig/${gig._id}`)}
+                      onClick={() => {
+                        setSelectedGig(gig);
+                        setIsModelOpen(true);
+                      }}
                     >
                       View Gig
                     </Button>
@@ -155,6 +161,11 @@ const Freelancers = ({ searchQuery }) => {
           );
         })
       )}
+      <GigsDetailModal
+        open={isModelOpen}
+        onClose={() => setIsModelOpen(false)}
+        gig={selectedGig}
+      />
     </div>
   );
 };

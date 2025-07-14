@@ -193,7 +193,7 @@ const ClientDashboard = () => {
               handle="jaythakor"
               status="Online"
               contactText="Contact Me"
-              avatarUrl="https://collection.cloudinary.com/dw8mhnhu5/41d98f80b874e4e226e11f2ed5973ff5"
+              avatarUrl=""
               showUserInfo={true}
               enableTilt={true}
               onContactClick={() => console.log("Contact clicked")}

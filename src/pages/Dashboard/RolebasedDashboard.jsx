@@ -4,8 +4,15 @@ import ClientDashboard from "./ClientDashboard.jsx";
 import FreelancerDashboard from "./FreelancerDashboard";
 
 const RolebasedDashboard = () => {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-center">
+        <p className="text-lg text-gray-500 font-semibold">Loading...</p>
+      </div>
+    );
+  }
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center text-center">
