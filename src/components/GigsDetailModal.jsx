@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import React from "react";
+import API from "../utils/api";
 
 const GigsDetailModal = ({ open, onClose, gig }) => {
   if (!gig) {
@@ -19,6 +20,24 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
     "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg?semt=ais_hybrid&w=740";
 
   const username = gig?.userId?.username || "Unknown User";
+
+  const handleHireNow = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+
+      const res = await API.post("/checkout/create-checkout-session", {
+        gig: gig,
+        userId: user.id,
+        price: gig.price,
+        gigImg:
+          gig.thumbnail || "https://via.placeholder.com/400x240?text=No+Image",
+      });
+      window.location.href = res.data.url; // Redirect to Stripe Checkout
+    } catch (error) {
+      console.error("Error creating checkout session:", error);
+      alert("Failed to create checkout session. Please try again later.");
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -66,7 +85,10 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
             </div>
 
             <div className="flex gap-4 mt-4">
-              <Button className="flex-1 bg-green-500 hover:bg-green-600 text-white">
+              <Button
+                onClick={handleHireNow}
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white"
+              >
                 Hire Now
               </Button>
               <Button
