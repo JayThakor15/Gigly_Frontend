@@ -1,10 +1,24 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { AuthContext } from "../../context/authContext.jsx";
-import ClientDashboard from "./ClientDashboard.jsx";
-import FreelancerDashboard from "./FreelancerDashboard";
+import { useNavigate } from "react-router-dom";
 
 const RolebasedDashboard = () => {
   const { user, loading } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading) {
+      if (!user) {
+        navigate("/"); // Or your login page
+      } else if (user.role === "freelancer") {
+        navigate("/freelancerdashboard");
+      } else if (user.role === "client") {
+        navigate("/clientdashboard");
+      } else {
+        navigate("/"); // fallback
+      }
+    }
+  }, [user, loading, navigate]);
 
   if (loading) {
     return (
@@ -13,29 +27,9 @@ const RolebasedDashboard = () => {
       </div>
     );
   }
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-center">
-        <p className="text-lg text-red-500 font-semibold">
-          You must be logged in to view this page.
-        </p>
-      </div>
-    );
-  }
 
-  if (user.role === "freelancer") {
-    return <FreelancerDashboard />;
-  } else if (user.role === "client") {
-    return <ClientDashboard />;
-  } else {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-center">
-        <p className="text-lg text-red-500 font-semibold">
-          Unknown role. Please contact support.
-        </p>
-      </div>
-    );
-  }
+  // Optionally, you can show nothing since useEffect will navigate
+  return null;
 };
 
 export default RolebasedDashboard;
