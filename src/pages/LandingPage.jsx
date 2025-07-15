@@ -8,15 +8,7 @@ import Footer from '../components/Footer'
 import RegLogModel from '../components/RegLogModel'
 
 
-
 const LandingPage = () => {
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-    }
-  }, []);
 
   return (
     <div className="h-screen">

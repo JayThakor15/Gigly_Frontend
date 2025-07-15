@@ -14,6 +14,8 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
   if (!gig) {
     return null;
   }
+  console.log("Selected gig:", gig);
+  
 
   const avatarUrl =
     gig?.freelancerId?.avatar ||
@@ -24,7 +26,12 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
   const handleHireNow = async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-
+      localStorage.setItem("gigId", gig._id);
+      localStorage.setItem("freelancerId", gig.freelancerId._id);
+      localStorage.setItem("price", gig.price);
+      localStorage.setItem("gigTitle", gig.title);
+      localStorage.setItem("freelancerName", username);
+     
       const res = await API.post("/checkout/create-checkout-session", {
         gig: gig,
         userId: user.id,
