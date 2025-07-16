@@ -4,6 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 @plugin "daisyui";
 
+
 /* Add to your index.css or global styles */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

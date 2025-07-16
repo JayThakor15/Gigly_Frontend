@@ -10,7 +10,7 @@ import RegLogModel from '../components/RegLogModel'
 
 const LandingPage = () => {
 
-  return (
+  return ( 
     <div className="h-screen">
       <Navbar />
       <RegLogModel />

@@ -130,7 +130,7 @@ const Navbar = () => {
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/freelancerorders")}>
                       <CreditCard className="mr-2 h-4 w-4" />
                       <span>Your Orders</span>
                       <DropdownMenuShortcut>⌘O</DropdownMenuShortcut>
@@ -150,7 +150,7 @@ const Navbar = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             </li>
-          ) : (isLoggedIn && user?.role === "client") ? (
+          ) : isLoggedIn && user?.role === "client" ? (
             <li>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -185,7 +185,7 @@ const Navbar = () => {
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/clientorders")}>
                       <CreditCard className="mr-2 h-4 w-4" />
                       <span>Your Orders</span>
                       <DropdownMenuShortcut>⌘O</DropdownMenuShortcut>
