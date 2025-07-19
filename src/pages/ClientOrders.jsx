@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import API from "../utils/api";
 import Navbar from "../components/Navbar";
+import toast, { Toaster } from "react-hot-toast";
 
 // Stepper UI for order status
 const OrderStepper = ({ order }) => {
@@ -62,9 +63,17 @@ const OrderStepper = ({ order }) => {
       <div className="stepper-box">
         {steps.map((step, idx) => {
           let stepClass = "stepper-step ";
-          if (idx < currentStepIndex) stepClass += "stepper-completed";
-          else if (idx === currentStepIndex) stepClass += "stepper-active";
-          else stepClass += "stepper-pending";
+          // Mark as completed if before current step, or if it's the delivered step and status is delivered
+          if (
+            idx < currentStepIndex ||
+            (step.key === "delivered" && order.status === "delivered")
+          ) {
+            stepClass += "stepper-completed";
+          } else if (idx === currentStepIndex) {
+            stepClass += "stepper-active";
+          } else {
+            stepClass += "stepper-pending";
+          }
           return (
             <div className={stepClass} key={step.key}>
               <div className="stepper-circle">
@@ -95,7 +104,14 @@ const OrderStepper = ({ order }) => {
   );
 };
 
-const OrderModal = ({ order, open, onClose }) => {
+const OrderModal = ({
+  order,
+  open,
+  onClose,
+  onAccept,
+  showReviewBtn,
+  onReview,
+}) => {
   if (!open || !order) return null;
 
   return (
@@ -155,6 +171,22 @@ const OrderModal = ({ order, open, onClose }) => {
             </div>
           )}
           <div className="mt-6 flex justify-end">
+            {order.status === "submitted" && !showReviewBtn && (
+              <button
+                className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 py-2 rounded-full font-semibold shadow hover:scale-105 transition-all duration-300 mr-4"
+                onClick={onAccept}
+              >
+                Accept Order
+              </button>
+            )}
+            {showReviewBtn && (
+              <button
+                className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 py-2 rounded-full font-semibold shadow hover:scale-105 transition-all duration-300 mr-4"
+                onClick={onReview}
+              >
+                Leave Review
+              </button>
+            )}
             <button
               className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 py-2 rounded-full font-semibold shadow hover:scale-105 transition-all duration-300"
               onClick={() => alert("Chat feature coming soon!")}
@@ -163,6 +195,58 @@ const OrderModal = ({ order, open, onClose }) => {
             </button>
           </div>
         </div>
+      </div>
+    </div>
+  );
+};
+
+// Feedback Modal
+const FeedbackModal = ({ open, onClose, onSubmit }) => {
+  const [rating, setRating] = useState(0);
+  const [review, setReview] = useState("");
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full relative animate-fade-in">
+        <button
+          className="absolute top-3 right-3 text-gray-400 hover:text-red-500 text-2xl"
+          onClick={onClose}
+        >
+          &times;
+        </button>
+        <h2 className="text-xl font-bold mb-4">Leave Feedback</h2>
+        <form onSubmit={() => onSubmit(rating, review)} className="space-y-4">
+          <div>
+            <label className="block font-semibold mb-1">Rating</label>
+            <input
+              type="number"
+              className="w-full border rounded px-3 py-2"
+              min="1"
+              max="5"
+              value={rating}
+              onChange={(e) => setRating(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="block font-semibold mb-1">Review</label>
+            <textarea
+              className="w-full border rounded px-3 py-2"
+              value={review}
+              onChange={(e) => setReview(e.target.value)}
+              placeholder="Your review..."
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded"
+          >
+            Submit Feedback
+          </button>
+        </form>
       </div>
     </div>
   );
@@ -278,6 +362,8 @@ const ClientOrders = () => {
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
+  const [showReviewBtn, setShowReviewBtn] = useState(false);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -294,11 +380,39 @@ const ClientOrders = () => {
     fetchOrders();
   }, []);
 
+  const handleAccept = async () => {
+    try {
+      await API.patch(`/orders/${selectedOrder._id}/accept`);
+      toast.success("Order accepted!");
+      setShowReviewBtn(true); // Show the review button
+    } catch (err) {
+      toast.error("Failed to accept order");
+    }
+  };
+
+  const handleReview = () => {
+    setFeedbackModalOpen(true);
+    setShowReviewBtn(false);
+  };
+
+  const handleSubmitFeedback = async (rating, review) => {
+    try {
+      await API.patch(`/orders/${selectedOrder._id}/rate`, { rating, review });
+      setFeedbackModalOpen(false);
+      toast.success("Feedback submitted successfully!");
+      setModalOpen(false);
+      setShowReviewBtn(false);
+    } catch (err) {
+      console.error("Error submitting feedback:", err);
+    }
+  };
+
   if (loading) {
     return <p className="text-center">Loading your orders...</p>;
   }
   return (
     <div className="min-h-screen">
+      <Toaster />
       <Navbar />
       <div className="p-4 max-w-4xl mx-auto bg-gray-100 rounded-2xl">
         <h1 className="text-3xl font-bold mb-6">My Orders</h1>
@@ -349,7 +463,18 @@ const ClientOrders = () => {
       <OrderModal
         order={selectedOrder}
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={() => {
+          setModalOpen(false);
+          setShowReviewBtn(false);
+        }}
+        onAccept={handleAccept}
+        showReviewBtn={showReviewBtn}
+        onReview={handleReview}
+      />
+      <FeedbackModal
+        open={feedbackModalOpen}
+        onClose={() => setFeedbackModalOpen(false)}
+        onSubmit={handleSubmitFeedback}
       />
     </div>
   );

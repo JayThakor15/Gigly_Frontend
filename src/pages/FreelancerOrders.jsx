@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import API from "../utils/api";
 import Navbar from "../components/Navbar";
 import { Button } from "@/components/ui/button";
+import SubmitDelivery from "../components/SubmitDelivery";
 
-const OrderModal = ({ order, open, onClose, onAccept }) => {
+const OrderModal = ({ order, open, onClose, onAccept, onOpenDelivery, onReview }) => {
   if (!open || !order) return null;
 
-  // Status badge colors
   const statusColors = {
     processing: "bg-yellow-400",
     "in-progress": "bg-blue-400",
@@ -23,7 +23,6 @@ const OrderModal = ({ order, open, onClose, onAccept }) => {
         >
           &times;
         </button>
-
         <div className="flex items-center gap-4 mb-6">
           <img
             src={order.gigId?.thumbnail || "https://via.placeholder.com/150"}
@@ -37,7 +36,6 @@ const OrderModal = ({ order, open, onClose, onAccept }) => {
             </p>
           </div>
         </div>
-
         <div className="mb-4">
           <span
             className={`inline-block px-4 py-2 rounded-full font-semibold text-white text-lg animate-pulse ${
@@ -47,7 +45,6 @@ const OrderModal = ({ order, open, onClose, onAccept }) => {
             {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
           </span>
         </div>
-
         <div className="mb-2 text-gray-700">
           <strong>Amount Paid:</strong> ₹{order.price}
         </div>
@@ -58,7 +55,6 @@ const OrderModal = ({ order, open, onClose, onAccept }) => {
           <strong>Placed On:</strong>{" "}
           {new Date(order.createdAt).toLocaleString()}
         </div>
-
         {order.status === "processing" && (
           <Button
             className="mt-4 w-full bg-green-500 hover:bg-green-600 text-white font-bold"
@@ -67,14 +63,29 @@ const OrderModal = ({ order, open, onClose, onAccept }) => {
             Accept Order
           </Button>
         )}
-
-        <div className="mt-6 flex justify-end">
+        <div className="mt-6 gap-5 flex justify-end">
           <Button
             variant="outline"
             onClick={() => alert("Chat feature coming soon!")}
           >
             Chat with Client
           </Button>
+          {order.status === "in-progress" && (
+            <Button
+              className="bg-green-500 hover:bg-green-600 text-white font-bold"
+              onClick={() => onOpenDelivery(order._id)}
+            >
+              Mark as Submitted
+            </Button>
+          )}
+          {order.status === "delivered" && (
+            <Button
+              className="bg-green-500 hover:bg-green-600 text-white font-bold"
+              onClick={() => alert("Delivered feature coming soon!")}
+            >
+             See Review
+            </Button>
+          )}
         </div>
       </div>
     </div>
@@ -86,11 +97,14 @@ const FreelancerOrders = () => {
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [deliveryModalOpen, setDeliveryModalOpen] = useState(false);
+  const [deliveryOrderId, setDeliveryOrderId] = useState(null);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+
 
   const fetchOrders = async () => {
     try {
       const res = await API.get("/orders/freelancer-order");
-      console.log("Freelancer Orders:", res.data);
       setOrders(res.data);
     } catch (err) {
       console.error("Error fetching freelancer orders:", err);
@@ -111,6 +125,30 @@ const FreelancerOrders = () => {
     } catch (err) {
       console.error("Error accepting order:", err);
     }
+  };
+
+  const handleSubmit = async (orderId, deliveryFileUrl, deliveryMessage) => {
+    try {
+      await API.patch(`/orders/${orderId}/complete`, {
+        deliveryFileUrl,
+        deliveryMessage,
+      });
+      await fetchOrders();
+      setDeliveryModalOpen(false);
+      setModalOpen(false);
+    } catch (err) {
+      console.error("Error submitting order:", err);
+    }
+  };
+
+  const handleOpenDelivery = (orderId) => {
+    setDeliveryOrderId(orderId);
+    setDeliveryModalOpen(true);
+  };
+
+  const handleReview = (orderId) => {
+    setReviewOrderId(orderId);
+    setReviewModalOpen(true);
   };
 
   if (loading) {
@@ -171,8 +209,21 @@ const FreelancerOrders = () => {
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         onAccept={handleAccept}
+        onOpenDelivery={handleOpenDelivery}
       />
-    </div>
+      <SubmitDelivery
+        open={deliveryModalOpen}
+        onClose={() => setDeliveryModalOpen(false)}
+        onSubmit={handleSubmit}
+        orderId={deliveryOrderId}
+      />
+      <ReviewModal
+        open={reviewModalOpen}
+        onClose={() => setReviewModalOpen(false)}
+        onSubmit={handleReview}
+        orderId={reviewOrderId}
+      />
+    </div> 
   );
 };
 
