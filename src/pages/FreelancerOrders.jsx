@@ -3,8 +3,16 @@ import API from "../utils/api";
 import Navbar from "../components/Navbar";
 import { Button } from "@/components/ui/button";
 import SubmitDelivery from "../components/SubmitDelivery";
+import ReviewModal from "../components/ReviewModal";
 
-const OrderModal = ({ order, open, onClose, onAccept, onOpenDelivery, onReview }) => {
+const OrderModal = ({
+  order,
+  open,
+  onClose,
+  onAccept,
+  onOpenDelivery,
+  onReview,
+}) => {
   if (!open || !order) return null;
 
   const statusColors = {
@@ -55,15 +63,16 @@ const OrderModal = ({ order, open, onClose, onAccept, onOpenDelivery, onReview }
           <strong>Placed On:</strong>{" "}
           {new Date(order.createdAt).toLocaleString()}
         </div>
-        {order.status === "processing" && (
-          <Button
-            className="mt-4 w-full bg-green-500 hover:bg-green-600 text-white font-bold"
-            onClick={() => onAccept(order._id)}
-          >
-            Accept Order
-          </Button>
-        )}
+ 
         <div className="mt-6 gap-5 flex justify-end">
+          {order.status === "processing" && (
+            <Button
+              className=" bg-green-500 hover:bg-green-600 text-white font-bold"
+              onClick={() => onAccept(order._id)}
+            >
+              Accept Order
+            </Button>
+          )}
           <Button
             variant="outline"
             onClick={() => alert("Chat feature coming soon!")}
@@ -81,9 +90,9 @@ const OrderModal = ({ order, open, onClose, onAccept, onOpenDelivery, onReview }
           {order.status === "delivered" && (
             <Button
               className="bg-green-500 hover:bg-green-600 text-white font-bold"
-              onClick={() => alert("Delivered feature coming soon!")}
+              onClick={() => onReview(order._id)}
             >
-             See Review
+              See Review
             </Button>
           )}
         </div>
@@ -100,7 +109,7 @@ const FreelancerOrders = () => {
   const [deliveryModalOpen, setDeliveryModalOpen] = useState(false);
   const [deliveryOrderId, setDeliveryOrderId] = useState(null);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
-
+  const [reviewOrderId, setReviewOrderId] = useState(null);
 
   const fetchOrders = async () => {
     try {
@@ -210,6 +219,7 @@ const FreelancerOrders = () => {
         onClose={() => setModalOpen(false)}
         onAccept={handleAccept}
         onOpenDelivery={handleOpenDelivery}
+        onReview={handleReview}
       />
       <SubmitDelivery
         open={deliveryModalOpen}
@@ -220,10 +230,9 @@ const FreelancerOrders = () => {
       <ReviewModal
         open={reviewModalOpen}
         onClose={() => setReviewModalOpen(false)}
-        onSubmit={handleReview}
         orderId={reviewOrderId}
       />
-    </div> 
+    </div>
   );
 };
 

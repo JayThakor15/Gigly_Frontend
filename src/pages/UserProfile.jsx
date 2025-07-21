@@ -114,11 +114,7 @@ const UserProfile = () => {
             <h1 className="text-2xl font-bold">{user?.username}</h1>
             <p className="text-gray-600">{user?.email}</p>
           </div>
-          <div className="h-full w-full">
-            <Button className="w-20 relative right-3 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
-              Edit Profile
-            </Button>
-          </div>
+          
         </div>
 
         {/* Right Side */}

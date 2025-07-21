@@ -1,6 +1,6 @@
 import React from "react";
 import Navbar from "../components/Navbar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import API from "../utils/api";
 
@@ -9,6 +9,7 @@ const PaymentProcessing = () => {
   const sessionId = searchParams.get("session_id");
   const [status, setStatus] = useState("Processing");
   const navigate = useNavigate();
+  const hasOrdered = useRef(false);
 
   useEffect(() => {
     async function handleOrder() {
@@ -36,9 +37,10 @@ const PaymentProcessing = () => {
       }
     }
 
-    if (sessionId) {
+    if (sessionId && !hasOrdered.current) {
+      hasOrdered.current = true;
       handleOrder();
-    } else {
+    } else if (!sessionId) {
       setStatus("failure");
     }
   }, [sessionId]);

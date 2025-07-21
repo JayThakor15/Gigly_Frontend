@@ -4,9 +4,9 @@ import { WritingText } from "@/components/animate-ui/text/writing";
 import Freelancers from "../../components/Freelancers";
 import Footer from "../../components/Footer";
 import { useNavigate } from "react-router-dom";
-import ProfileCard from "../../../component/ProfileCard/ProfileCard";
-import { useState } from "react";
+import MagicContainer from "../../../component/magic card/magiccard";
 
+import { useState } from "react";
 
 const categories = [
   { name: "Web Development", icon: "💻" },
@@ -118,7 +118,9 @@ const ClientDashboard = () => {
                 onClick={() => {
                   setSearchQuery(cat.name); // Set search query to category name
                   // Optionally scroll to gigs section
-                  const gigsSection = document.getElementById("freelancer-gigs-section");
+                  const gigsSection = document.getElementById(
+                    "freelancer-gigs-section"
+                  );
                   if (gigsSection) {
                     gigsSection.scrollIntoView({ behavior: "smooth" });
                   }
@@ -185,19 +187,71 @@ const ClientDashboard = () => {
                 capable hands.
               </p>
             </div>
+            <div className="flex items-center justify-center p-4 w-full ml-20">
+              <MagicContainer className="w-full max-w-2xl md:max-w-3xl min-w-[340px] md:min-w-[400px]">
+                <div className="w-full rounded-[23px] bg-white dark:bg-gray-900 shadow-lg overflow-hidden">
+                  {/* Cover Image */}
+                  <div className="relative h-32">
+                    <img
+                      src="magiccardbg.png"
+                      alt="Cover"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
 
-            {/* Meet the Creator Section */}
-            <ProfileCard
-              name="Jay Thakor"
-              title="Full Stack Developer"
-              handle="jaythakor"
-              status="Online"
-              contactText="Contact Me"
-              avatarUrl=""
-              showUserInfo={true}
-              enableTilt={true}
-              onContactClick={() => console.log("Contact clicked")}
-            />
+                  {/* Profile Content */}
+                  <div className="relative p-6 pt-0">
+                    {/* Profile Image */}
+                    <div className="absolute left-6 -top-12">
+                      <img
+                        src="Jay_PIc.jpeg"
+                        alt="Profile"
+                        className="w-24 h-24 rounded-full border-4 border-white dark:border-gray-800 object-cover"
+                      />
+                    </div>
+
+                    {/* User Info */}
+                    <div className="text-left pt-2 mt-4">
+                      <h2 className="text-2xl mt-10 font-bold text-gray-800 dark:text-gray-100">
+                        Jay Thakor
+                      </h2>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        @jaythakor
+                      </p>
+                      <p className="text-gray-700 dark:text-gray-300 leading-snug">
+                        Full Stack Dev 🚀 | React • Express • MongoDB |
+                        Generative AI Tinkerer | BTech CE Student
+                      </p>
+                    </div>
+
+                    {/* Skills and Expertise */}
+                    // add one seperator
+                    <div className="border-t border-gray-200 dark:border-gray-700 mt-4"></div>
+                    <div className="flex items-center justify-between mt-4">
+                     <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">Skills and Expertise</h1>
+                    </div>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      <span className="bg-gray-200 font-medium dark:bg-gray-700 text-[#364153] dark:text-gray-300 px-3 py-1 rounded-full text-lg">
+                        React
+                      </span>
+                      <span className="bg-gray-200 font-medium dark:bg-gray-700 text-[#364153] dark:text-gray-300 px-3 py-1 rounded-full text-lg">
+                        Express
+                      </span>
+                      <span className="bg-gray-200 font-medium dark:bg-gray-700 text-[#364153] dark:text-gray-300 px-3 py-1 rounded-full text-lg">
+                        MongoDB
+                      </span>
+                      <span className="bg-gray-200 font-medium dark:bg-gray-700 text-[#364153] dark:text-gray-300 px-3 py-1 rounded-full text-lg">
+                        NodeJS
+                      </span>
+                      <span className="bg-gray-200 font-medium dark:bg-gray-700 text-[#364153] dark:text-gray-300 px-3 py-1 rounded-full text-lg">
+                        Generative AI
+                      </span>
+
+</div>
+                  </div>
+                </div>
+              </MagicContainer>
+            </div>
           </div>
         </div>
       </div>

@@ -14,8 +14,7 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
   if (!gig) {
     return null;
   }
-  console.log("Selected gig:", gig);
-  
+
 
   const avatarUrl =
     gig?.freelancerId?.avatar ||
