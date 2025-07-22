@@ -7,7 +7,6 @@ const RolebasedDashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("User role:", user?.role);
     if (!loading) {
       if (!user) {
         navigate("/"); // Or your login page

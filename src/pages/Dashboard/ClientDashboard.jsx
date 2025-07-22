@@ -5,6 +5,7 @@ import Freelancers from "../../components/Freelancers";
 import Footer from "../../components/Footer";
 import { useNavigate } from "react-router-dom";
 import MagicContainer from "../../../component/magic card/magiccard";
+import SparklesText from './../../../component/sparktext/SparklesText';
 
 import { useState } from "react";
 
@@ -100,11 +101,12 @@ const ClientDashboard = () => {
         className="flex flex-col justify-center mt-5"
         id="freelancer-gigs-section"
       >
-        <h1 className="text-4xl font-medium text-white mb-2 text-center">
-          Get it done with right Freelancer
-        </h1>
+        <SparklesText text="Freelancers" />
+       
         <div className="p-6">
+        <div className="bg-white rounded-2xl py-5 px-2">
           <Freelancers searchQuery={searchQuery} />
+        </div>
         </div>
         <div className="flex flex-col justify-center items-center mt-5">
           <h1 className="text-4xl font-medium text-white mb-2 text-center">
@@ -204,7 +206,7 @@ const ClientDashboard = () => {
                     {/* Profile Image */}
                     <div className="absolute left-6 -top-12">
                       <img
-                        src="Jay_PIc.jpeg"
+                        src="Jay_PIc.jpg"
                         alt="Profile"
                         className="w-24 h-24 rounded-full border-4 border-white dark:border-gray-800 object-cover"
                       />

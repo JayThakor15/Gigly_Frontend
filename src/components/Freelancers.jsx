@@ -10,6 +10,9 @@ const Freelancers = ({ searchQuery }) => {
   const [filteredGigs, setFilteredGigs] = useState([]);
   const [selectedGig, setSelectedGig] = useState(null);
   const [isModelOpen, setIsModelOpen] = useState(false);
+  const [freelancerRatings, setFreelancerRatings] = useState({});
+
+  // get all freelancers ids
 
   useEffect(() => {
     const fetchAllGigs = async () => {
@@ -28,8 +31,32 @@ const Freelancers = ({ searchQuery }) => {
   }, []);
 
   useEffect(() => {
+    const fetchFreelancerRatings = async () => {
+      try {
+        const freelancerIds = allgigs.map((gig) => gig.freelancerId?._id);
+        const uniqueIds = [...new Set(freelancerIds.filter(Boolean))];
+
+        if (uniqueIds.length === 0) return;
+
+        const res = await API.post("/orders/freelancer/rating", {
+          ids: uniqueIds,
+        });
+
+        setFreelancerRatings(res.data);
+      } catch (error) {
+        console.log("Error fetching freelancer ratings:", error);
+      }
+    };
+
+    if (allgigs.length > 0) {
+      fetchFreelancerRatings();
+    }
+  }, [allgigs]);
+
+  useEffect(() => {
     if (!searchQuery) {
       setFilteredGigs(allgigs);
+
       return;
     }
 
@@ -62,6 +89,12 @@ const Freelancers = ({ searchQuery }) => {
         </div>
       ) : (
         filteredGigs.map((gig) => {
+          const freelancerId = gig.freelancerId?._id;
+          // Find the rating object by matching freelancerId
+          const ratingObj = Object.values(freelancerRatings).find(
+            (r) => r.freelancerId === freelancerId
+          );
+
           const avatarUrl =
             gig.freelancerId &&
             typeof gig.freelancerId === "object" &&
@@ -76,10 +109,7 @@ const Freelancers = ({ searchQuery }) => {
 
           return (
             <MotionHighlight key={gig._id} hover className="rounded-xl">
-              <div
-                className="group relative bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-gray-100 min-h-[320px] max-w-xs mx-auto"
-                style={{ width: "100%" }}
-              >
+              <div className="group relative bg-white rounded-xl shadow-xl overflow-hidden hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-gray-100 min-h-[320px] max-w-xs mx-auto">
                 {/* Gradient Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-br from-green-400/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
 
@@ -120,6 +150,42 @@ const Freelancers = ({ searchQuery }) => {
                       </p>
                       <p className="text-gray-500 text-[10px]">Freelancer</p>
                     </div>
+                    {ratingObj && (
+                      <div className="flex items-center gap-1 ml-auto text-2xl">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          className="w-4 h-5 text-yellow-400"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <span className="text-sm font-medium text-gray-700">
+                          {ratingObj.averageRating}
+                        </span>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-4 h-5 text-blue-500"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"
+                          />
+                        </svg>
+                        <span className="text-sm font-medium text-gray-700">
+                          {ratingObj.totalReviews}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Gig Title */}
