@@ -11,7 +11,7 @@ import CancelPayment from "./pages/CancelPayment";
 import PaymentProcessing from "./pages/PaymentProcessing";
 import ClientOrders from "./pages/clientOrders";
 import FreelancerOrders from "./pages/FreelancerOrders";
-
+import GlobalChatWidget from "./components/GlobalChatWidget";
 
 function App() {
   return (
@@ -32,9 +32,10 @@ function App() {
           <Route path="/paymentprocessing" element={<PaymentProcessing />} />
           <Route path="/clientorders" element={<ClientOrders />} />
           <Route path="/freelancerorders" element={<FreelancerOrders />} />
-    
+
           {/* Add other routes as needed */}
         </Routes>
+        <GlobalChatWidget />
       </BrowserRouter>
     </div>
   );

@@ -61,6 +61,12 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
       toast.error("Failed to load reviews.");
     }
   };
+  // Chat Open Function
+  const handleChatOpen = () => {
+    if (window.startGlobalChat && gig?.freelancerId?._id) {
+      window.startGlobalChat(gig.freelancerId._id);
+    }
+  };
 
   useEffect(() => {
     fetchReviews();
@@ -231,6 +237,7 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
               <Button
                 variant="outline"
                 className="flex-1 border-green-500 text-green-600 hover:bg-green-50"
+                onClick={handleChatOpen}
               >
                 Chat
               </Button>
