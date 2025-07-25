@@ -19,22 +19,23 @@ const FreelancerChat = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user?.id && user?.role === "freelancer") {
       setCurrentUserId(user.id);
-      fetchConversations();
+     
     }
   }, []);
 
   useEffect(() => {
     if (currentUserId && isOpen) {
-      socket.emit("add-user", currentUserId);
+      socket.emit("addUser", currentUserId);
       setIsConnected(true);
 
       socket.on("msg-receive", (data) => {
+        console.log(data);
         if (data.receiverId === currentUserId) {
           setMessages((prev) => [
             ...prev,
             {
               sender: "client",
-              text: data.message,
+              text: data.text,
               senderId: data.senderId,
               timestamp: new Date(),
             },
@@ -57,40 +58,7 @@ const FreelancerChat = () => {
     }
   }, [currentUserId, isOpen, selectedClient]);
 
-  const fetchConversations = async () => {
-    try {
-      // For now, using dummy data. Replace with actual API call
-      const dummyConversations = [
-        {
-          userId: "client1",
-          username: "John Doe",
-          avatar:
-            "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg",
-          lastMessage: "Hello, I need help with my project",
-          isOnline: true,
-        },
-        {
-          userId: "client2",
-          username: "Jane Smith",
-          avatar:
-            "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg",
-          lastMessage: "When can we start?",
-          isOnline: false,
-        },
-        {
-          userId: "client3",
-          username: "Mike Johnson",
-          avatar:
-            "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg",
-          lastMessage: "Thanks for the quick response!",
-          isOnline: true,
-        },
-      ];
-      setConversations(dummyConversations);
-    } catch (error) {
-      console.error("Error fetching conversations:", error);
-    }
-  };
+
 
   const fetchMessages = async (clientId) => {
     try {
@@ -171,7 +139,7 @@ const FreelancerChat = () => {
   const toggleChat = () => {
     setIsOpen(!isOpen);
     if (!isOpen) {
-      fetchConversations();
+    
     }
   };
 

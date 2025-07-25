@@ -43,9 +43,9 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
   const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState(null);
   const [showReviewForm, setShowReviewForm] = useState(false);
-  const [clientRating, setClientRating] = useState(0); // State for the new review's rating
-  const [clientFeedback, setClientFeedback] = useState(""); // State for the new review's feedback
-  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
+  const [clientRating, setClientRating] = useState(0);
+  const [clientFeedback, setClientFeedback] = useState("");
 
   // Function to fetch reviews (can be called after submitting a new review)
   const fetchReviews = async () => {
@@ -63,8 +63,12 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
   };
   // Chat Open Function
   const handleChatOpen = () => {
-    if (window.startGlobalChat && gig?.freelancerId?._id) {
-      window.startGlobalChat(gig.freelancerId._id);
+    console.log();
+
+    if (window.startGlobalChat && gig?.userId?._id && gig?.userId?.username) {
+      window.startGlobalChat(gig.userId._id, gig.userId.username);
+    } else {
+      toast.error("Failed to start chat.");
     }
   };
 
@@ -85,7 +89,7 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
     "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg?semt=ais_hybrid&w=740";
 
   // Ensure you're getting the freelancer's username from freelancerId
-  const username = gig?.freelancerId?.username || "Unknown Freelancer";
+  const username = gig?.userId?.username || "Unknown Freelancer";
 
   const handleHireNow = async () => {
     try {
@@ -115,54 +119,6 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
       toast.error("Failed to create checkout session. Please try again later.");
     }
   };
-
-  const handleSubmitReview = async () => {
-    if (clientRating === 0) {
-      toast.error("Please provide a star rating.");
-      return;
-    }
-    if (!clientFeedback.trim()) {
-      toast.error("Please write your feedback.");
-      return;
-    }
-
-    setIsSubmittingReview(true);
-    try {
-      const user = JSON.parse(localStorage.getItem("user"));
-      if (!user || !user.id) {
-        toast.error("You must be logged in to submit a review.");
-        setIsSubmittingReview(false);
-        return;
-      }
-
-      // Assuming your backend expects a specific endpoint and payload for reviews
-      // You might need to adjust this endpoint and payload based on your API
-      const res = await API.post(`/orders/add-review`, {
-        gigId: gig._id,
-        freelancerId: gig.freelancerId._id, // Ensure this is the correct freelancer ID
-        userId: user.id, // The client's ID who is writing the review
-        clientRating: clientRating,
-        clientFeedback: clientFeedback,
-      });
-
-      if (res.status === 201 || res.status === 200) {
-        // Check for successful response codes
-        toast.success("Review submitted successfully!");
-        setClientRating(0);
-        setClientFeedback("");
-        setShowReviewForm(false);
-        fetchReviews(); // Re-fetch reviews to update the list and average rating
-      } else {
-        toast.error(res.data.message || "Failed to submit review.");
-      }
-    } catch (error) {
-      console.error("Error submitting review:", error);
-      toast.error("An error occurred while submitting your review.");
-    } finally {
-      setIsSubmittingReview(false);
-    }
-  };
-
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl p-6 overflow-y-auto max-h-[90vh]">

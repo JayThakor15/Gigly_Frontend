@@ -8,7 +8,9 @@ const GlobalChatWidget = () => {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [senderUsername, setSenderUsername] = useState(null); // Added state for sender username
   const [receiverId, setReceiverId] = useState(null);
+  const [receiverName, setReceiverName] = useState(null); // Added state for receiver name
   const [isConnected, setIsConnected] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
 
@@ -16,6 +18,7 @@ const GlobalChatWidget = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user?.id) {
       setCurrentUserId(user.id);
+      setSenderUsername(user.username); // Added set sender username
     }
   }, []);
 
@@ -24,12 +27,12 @@ const GlobalChatWidget = () => {
       socket.emit("addUser", currentUserId);
       setIsConnected(true);
 
-      socket.on("getMessage", (data) => {
+      socket.on("msg-receive", (data) => {
         setMessages((prev) => [...prev, data]);
       });
 
       return () => {
-        socket.off("getMessage");
+        socket.off("msg-receive");
         setIsConnected(false);
       };
     }
@@ -39,13 +42,13 @@ const GlobalChatWidget = () => {
     if (text.trim() === "" || !receiverId) return;
 
     const message = {
+      senderUsername,
       senderId: currentUserId,
       receiverId,
       text,
-      timestamp: new Date().toISOString(),
     };
 
-    socket.emit("sendMessage", message);
+    socket.emit("send-msg", message);
     setMessages((prev) => [...prev, message]);
     setText("");
   };
@@ -70,13 +73,15 @@ const GlobalChatWidget = () => {
     setIsOpen(false);
     setMessages([]);
     setReceiverId(null);
+    setReceiverName(null); // Added reset receiver name
     setShowAnimation(false);
   };
 
   // Function to start a chat with a specific user (can be called from other components)
-  const startChat = (targetUserId) => {
+  const startChat = (targetUserId, receiverName) => {
     setShowAnimation(true);
     setReceiverId(targetUserId);
+    setReceiverName(receiverName);
     setIsOpen(true);
 
     // Hide animation after 2 seconds
@@ -130,7 +135,7 @@ const GlobalChatWidget = () => {
           <div className="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-green-300 rounded-full animate-pulse"></div>
-              <h3 className="font-semibold">Chat</h3>
+              <h3 className="font-semibold">{receiverName}</h3>
               {isConnected && (
                 <span className="text-xs bg-green-400 px-2 py-1 rounded-full">
                   Online
