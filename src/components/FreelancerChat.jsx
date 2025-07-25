@@ -1,0 +1,437 @@
+import React, { useState, useEffect } from "react";
+import socket from "../utils/socket";
+import { Button } from "@/components/ui/button";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import API from "../utils/api";
+
+const FreelancerChat = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [conversations, setConversations] = useState([]);
+  const [selectedClient, setSelectedClient] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [showAnimation, setShowAnimation] = useState(false);
+  const [unreadCounts, setUnreadCounts] = useState({});
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user?.id && user?.role === "freelancer") {
+      setCurrentUserId(user.id);
+      fetchConversations();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (currentUserId && isOpen) {
+      socket.emit("add-user", currentUserId);
+      setIsConnected(true);
+
+      socket.on("msg-receive", (data) => {
+        if (data.receiverId === currentUserId) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              sender: "client",
+              text: data.message,
+              senderId: data.senderId,
+              timestamp: new Date(),
+            },
+          ]);
+
+          // Update unread count if not in active chat
+          if (!selectedClient || selectedClient.userId !== data.senderId) {
+            setUnreadCounts((prev) => ({
+              ...prev,
+              [data.senderId]: (prev[data.senderId] || 0) + 1,
+            }));
+          }
+        }
+      });
+
+      return () => {
+        socket.off("msg-receive");
+        setIsConnected(false);
+      };
+    }
+  }, [currentUserId, isOpen, selectedClient]);
+
+  const fetchConversations = async () => {
+    try {
+      // For now, using dummy data. Replace with actual API call
+      const dummyConversations = [
+        {
+          userId: "client1",
+          username: "John Doe",
+          avatar:
+            "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg",
+          lastMessage: "Hello, I need help with my project",
+          isOnline: true,
+        },
+        {
+          userId: "client2",
+          username: "Jane Smith",
+          avatar:
+            "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg",
+          lastMessage: "When can we start?",
+          isOnline: false,
+        },
+        {
+          userId: "client3",
+          username: "Mike Johnson",
+          avatar:
+            "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg",
+          lastMessage: "Thanks for the quick response!",
+          isOnline: true,
+        },
+      ];
+      setConversations(dummyConversations);
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+    }
+  };
+
+  const fetchMessages = async (clientId) => {
+    try {
+      // For now, using dummy data. Replace with actual API call
+      const dummyMessages = [
+        {
+          sender: "client",
+          text: "Hello! I need help with my website project.",
+          senderId: clientId,
+          timestamp: new Date(),
+        },
+        {
+          sender: "freelancer",
+          text: "Hi! I'd be happy to help. What kind of website are you looking to build?",
+          senderId: currentUserId,
+          timestamp: new Date(),
+        },
+        {
+          sender: "client",
+          text: "I need an e-commerce site with payment integration.",
+          senderId: clientId,
+          timestamp: new Date(),
+        },
+        {
+          sender: "freelancer",
+          text: "Perfect! I have experience with e-commerce platforms. When would you like to start?",
+          senderId: currentUserId,
+          timestamp: new Date(),
+        },
+      ];
+      setMessages(dummyMessages);
+
+      // Clear unread count for this conversation
+      setUnreadCounts((prev) => ({
+        ...prev,
+        [clientId]: 0,
+      }));
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
+  };
+
+  const handleSend = () => {
+    if (input.trim() === "" || !selectedClient) return;
+
+    const message = {
+      sender: "freelancer",
+      text: input,
+      senderId: currentUserId,
+      receiverId: selectedClient.userId,
+      timestamp: new Date(),
+    };
+
+    // Send via socket
+    socket.emit("send-msg", {
+      senderId: currentUserId,
+      receiverId: selectedClient.userId,
+      message: input,
+    });
+
+    setMessages((prev) => [...prev, message]);
+    setInput("");
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSend();
+    }
+  };
+
+  const selectClient = (client) => {
+    setSelectedClient(client);
+    fetchMessages(client.userId);
+    setShowAnimation(true);
+    setTimeout(() => setShowAnimation(false), 2000);
+  };
+
+  const toggleChat = () => {
+    setIsOpen(!isOpen);
+    if (!isOpen) {
+      fetchConversations();
+    }
+  };
+
+  const closeChat = () => {
+    setIsOpen(false);
+    setSelectedClient(null);
+    setMessages([]);
+  };
+
+  const getTotalUnreadCount = () => {
+    return Object.values(unreadCounts).reduce((sum, count) => sum + count, 0);
+  };
+
+  return (
+    <>
+      {/* Floating Chat Button */}
+      {!isOpen && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <Button
+            onClick={toggleChat}
+            className="w-16 h-16 rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 flex items-center justify-center animate-pulse"
+          >
+            <svg
+              className="w-7 h-7"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              />
+            </svg>
+          </Button>
+          {/* Unread Badge */}
+          {getTotalUnreadCount() > 0 && (
+            <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs font-bold">
+                {getTotalUnreadCount() > 99 ? "99+" : getTotalUnreadCount()}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* WhatsApp-like Chat Interface */}
+      {isOpen && (
+        <div className="fixed bottom-6 right-6 w-[800px] h-[500px] bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 flex overflow-hidden">
+          {/* Left Panel: Client List */}
+          <div className="w-1/3 bg-gray-50 border-r border-gray-200 flex flex-col">
+            {/* Header */}
+            <div className="bg-blue-500 text-white p-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-sm">Giglyy</h3>
+                {isConnected && (
+                  <div className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></div>
+                )}
+              </div>
+              <button
+                onClick={closeChat}
+                className="text-white hover:text-gray-200"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Client List */}
+            <div className="flex-1 overflow-y-auto">
+              {conversations.length === 0 ? (
+                <div className="p-4 text-center text-gray-500 text-sm">
+                  No conversations yet
+                </div>
+              ) : (
+                conversations.map((client) => (
+                  <div
+                    key={client.userId}
+                    onClick={() => selectClient(client)}
+                    className={`p-3 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors ${
+                      selectedClient?.userId === client.userId
+                        ? "bg-blue-50 border-l-4 border-l-blue-500"
+                        : ""
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <img
+                          src={client.avatar}
+                          alt={client.username}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                        {client.isOnline && (
+                          <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm text-gray-800 truncate">
+                          {client.username}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {client.lastMessage}
+                        </p>
+                      </div>
+                      {unreadCounts[client.userId] > 0 && (
+                        <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">
+                            {unreadCounts[client.userId]}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Right Panel: Chat Area */}
+          <div className="flex-1 flex flex-col">
+            {!selectedClient ? (
+              <div className="flex-1 flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4 mx-auto">
+                    <svg
+                      className="w-8 h-8 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-gray-500 text-sm">
+                    Select a client to start chatting
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Chat Header */}
+                <div className="bg-white border-b border-gray-200 p-3 flex items-center gap-3">
+                  <img
+                    src={selectedClient.avatar}
+                    alt={selectedClient.username}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                  <div>
+                    <p className="font-medium text-sm text-gray-800">
+                      {selectedClient.username}
+                    </p>
+                    <p className="text-xs text-green-500">
+                      {selectedClient.isOnline ? "Online" : "Offline"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Messages Area */}
+                <div className="flex-1 p-3 overflow-y-auto bg-gray-50">
+                  {showAnimation ? (
+                    <div className="flex flex-col items-center justify-center h-full">
+                      <div className="w-30 h-30 mb-2">
+                        <DotLottieReact
+                          src="https://lottie.host/7b7c55f3-1ee2-4c0d-8b07-a16fb90b2cfd/Thaqq6vlCh.lottie"
+                          loop
+                          autoplay
+                        />
+                      </div>
+                      <p className="text-blue-600 text-xs font-medium">
+                        Loading chat...
+                      </p>
+                    </div>
+                  ) : messages.length === 0 ? (
+                    <div className="flex items-center justify-center h-full text-center">
+                      <p className="text-gray-500 text-sm">
+                        No messages yet. Start the conversation!
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {messages.map((msg, idx) => (
+                        <div
+                          key={idx}
+                          className={`flex ${
+                            msg.sender === "freelancer"
+                              ? "justify-end"
+                              : "justify-start"
+                          }`}
+                        >
+                          <div
+                            className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
+                              msg.sender === "freelancer"
+                                ? "bg-blue-500 text-white rounded-br-none"
+                                : "bg-white border border-gray-200 text-gray-800 rounded-bl-none"
+                            }`}
+                          >
+                            {msg.text}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Input Area */}
+                <div className="p-3 border-t border-gray-200 bg-white">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Type your message..."
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    />
+                    <Button
+                      onClick={handleSend}
+                      disabled={!input.trim()}
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg disabled:opacity-50"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                        />
+                      </svg>
+                    </Button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
+
+export default FreelancerChat;

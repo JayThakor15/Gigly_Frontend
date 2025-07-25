@@ -13,7 +13,14 @@ import ClientOrders from "./pages/clientOrders";
 import FreelancerOrders from "./pages/FreelancerOrders";
 import GlobalChatWidget from "./components/GlobalChatWidget";
 
+// Auth
+import { useContext } from "react";
+import { AuthContext } from "./context/authContext.jsx";
+import FreelancerChat from "./components/FreelancerChat.jsx";
+
 function App() {
+  const { user } = useContext(AuthContext);
+
   return (
     <div className="App">
       <BrowserRouter>
@@ -35,7 +42,10 @@ function App() {
 
           {/* Add other routes as needed */}
         </Routes>
-        <GlobalChatWidget />
+
+        {/* Global Chat Widget of client only */}
+        {user?.role === "client" && <GlobalChatWidget />}
+        {user?.role === "freelancer" && <FreelancerChat />}
       </BrowserRouter>
     </div>
   );
