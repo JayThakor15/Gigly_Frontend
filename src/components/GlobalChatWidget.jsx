@@ -11,6 +11,7 @@ const GlobalChatWidget = () => {
   const [senderUsername, setSenderUsername] = useState(null); // Added state for sender username
   const [receiverId, setReceiverId] = useState(null);
   const [receiverName, setReceiverName] = useState(null); // Added state for receiver name
+  const [receiverAvatar, setReceiverAvatar] = useState(null); // Added state for receiver avatar
   const [isConnected, setIsConnected] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
 
@@ -74,14 +75,16 @@ const GlobalChatWidget = () => {
     setMessages([]);
     setReceiverId(null);
     setReceiverName(null); // Added reset receiver name
+    setReceiverAvatar(null); // Added reset receiver avatar
     setShowAnimation(false);
   };
 
   // Function to start a chat with a specific user (can be called from other components)
-  const startChat = (targetUserId, receiverName) => {
+  const startChat = (targetUserId, receiverName, receiverAvatar) => {
     setShowAnimation(true);
     setReceiverId(targetUserId);
     setReceiverName(receiverName);
+    setReceiverAvatar(receiverAvatar); // Added set receiver avatar
     setIsOpen(true);
 
     // Hide animation after 2 seconds
@@ -134,12 +137,18 @@ const GlobalChatWidget = () => {
           {/* Header */}
           <div className="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-green-300 rounded-full animate-pulse"></div>
-              <h3 className="font-semibold">{receiverName}</h3>
-              {isConnected && (
-                <span className="text-xs bg-green-400 px-2 py-1 rounded-full">
-                  Online
-                </span>
+              {receiverName && (
+                <div className="flex items-center gap-2">
+                  <img
+                    src={receiverAvatar}
+                    alt={receiverName}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                  <div>
+                    <h3 className="font-semibold">Simran</h3>
+                    <p className="text-xs text-gray-200">Freelancer</p>
+                  </div>
+                </div>
               )}
             </div>
             <button

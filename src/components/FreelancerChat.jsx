@@ -19,7 +19,6 @@ const FreelancerChat = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user?.id && user?.role === "freelancer") {
       setCurrentUserId(user.id);
-     
     }
   }, []);
 
@@ -29,25 +28,55 @@ const FreelancerChat = () => {
       setIsConnected(true);
 
       socket.on("msg-receive", (data) => {
-        console.log(data);
-        if (data.receiverId === currentUserId) {
-          setMessages((prev) => [
-            ...prev,
-            {
-              sender: "client",
-              text: data.text,
-              senderId: data.senderId,
-              timestamp: new Date(),
-            },
-          ]);
+        console.log("Received message:", data);
+        const newMessage = {
+          senderId: data.senderId,
+          text: data.text || data.message, // Support both field names
+          timestamp: new Date(),
+          fromSelf: false,
+        };
+        setMessages((prev) => [...prev, newMessage]);
 
-          // Update unread count if not in active chat
-          if (!selectedClient || selectedClient.userId !== data.senderId) {
-            setUnreadCounts((prev) => ({
-              ...prev,
-              [data.senderId]: (prev[data.senderId] || 0) + 1,
-            }));
+        // Add or update client in conversations list
+        setConversations((prev) => {
+          const existingClientIndex = prev.findIndex(
+            (client) => client.userId === data.senderId
+          );
+
+          if (existingClientIndex >= 0) {
+            // Update existing client's last message
+            const updated = [...prev];
+            updated[existingClientIndex] = {
+              ...updated[existingClientIndex],
+              lastMessage: data.text || data.message,
+              isOnline: true,
+            };
+            return updated;
+          } else {
+            // Add new client to conversations
+            const newClient = {
+              userId: data.senderId,
+              username: data.senderUsername || `User ${data.senderId}`,
+              avatar:
+                data.avatar ||
+                "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg",
+              lastMessage: data.text || data.message,
+              isOnline: true,
+            };
+            return [newClient, ...prev];
           }
+        });
+
+        // Add message to current chat if it's from the selected client
+        if (String(selectedClient?.userId) === String(data.senderId)) {
+          console.log("Adding message to current chat");
+          setMessages((prev) => [...prev, newMessage]);
+        } else {
+          // Update unread count for other conversations
+          setUnreadCounts((prev) => ({
+            ...prev,
+            [data.senderId]: (prev[data.senderId] || 0) + 1,
+          }));
         }
       });
 
@@ -57,55 +86,13 @@ const FreelancerChat = () => {
       };
     }
   }, [currentUserId, isOpen, selectedClient]);
-
-
-
-  const fetchMessages = async (clientId) => {
-    try {
-      // For now, using dummy data. Replace with actual API call
-      const dummyMessages = [
-        {
-          sender: "client",
-          text: "Hello! I need help with my website project.",
-          senderId: clientId,
-          timestamp: new Date(),
-        },
-        {
-          sender: "freelancer",
-          text: "Hi! I'd be happy to help. What kind of website are you looking to build?",
-          senderId: currentUserId,
-          timestamp: new Date(),
-        },
-        {
-          sender: "client",
-          text: "I need an e-commerce site with payment integration.",
-          senderId: clientId,
-          timestamp: new Date(),
-        },
-        {
-          sender: "freelancer",
-          text: "Perfect! I have experience with e-commerce platforms. When would you like to start?",
-          senderId: currentUserId,
-          timestamp: new Date(),
-        },
-      ];
-      setMessages(dummyMessages);
-
-      // Clear unread count for this conversation
-      setUnreadCounts((prev) => ({
-        ...prev,
-        [clientId]: 0,
-      }));
-    } catch (error) {
-      console.error("Error fetching messages:", error);
-    }
-  };
+  
 
   const handleSend = () => {
     if (input.trim() === "" || !selectedClient) return;
 
     const message = {
-      sender: "freelancer",
+      fromSelf: true,
       text: input,
       senderId: currentUserId,
       receiverId: selectedClient.userId,
@@ -114,9 +101,10 @@ const FreelancerChat = () => {
 
     // Send via socket
     socket.emit("send-msg", {
+      // senderUsername: senderUsername, // Added sender username
       senderId: currentUserId,
       receiverId: selectedClient.userId,
-      message: input,
+      text: input,
     });
 
     setMessages((prev) => [...prev, message]);
@@ -130,17 +118,15 @@ const FreelancerChat = () => {
   };
 
   const selectClient = (client) => {
+    console.log("Selecting client:", client);
     setSelectedClient(client);
-    fetchMessages(client.userId);
+    console.log("Fetching messages for client:", client.userId);
     setShowAnimation(true);
     setTimeout(() => setShowAnimation(false), 2000);
   };
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
-    if (!isOpen) {
-    
-    }
   };
 
   const closeChat = () => {
@@ -189,7 +175,7 @@ const FreelancerChat = () => {
 
       {/* WhatsApp-like Chat Interface */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 w-[800px] h-[500px] bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 flex overflow-hidden">
+        <div className="fixed bottom-6 right-6 w-[800px] h-110 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 flex overflow-hidden">
           {/* Left Panel: Client List */}
           <div className="w-1/3 bg-gray-50 border-r border-gray-200 flex flex-col">
             {/* Header */}
@@ -250,7 +236,7 @@ const FreelancerChat = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm text-gray-800 truncate">
-                          {client.username}
+                          Jayuu
                         </p>
                         <p className="text-xs text-gray-500 truncate">
                           {client.lastMessage}
@@ -306,7 +292,7 @@ const FreelancerChat = () => {
                   />
                   <div>
                     <p className="font-medium text-sm text-gray-800">
-                      {selectedClient.username}
+                      Jayuu
                     </p>
                     <p className="text-xs text-green-500">
                       {selectedClient.isOnline ? "Online" : "Offline"}
@@ -341,14 +327,12 @@ const FreelancerChat = () => {
                         <div
                           key={idx}
                           className={`flex ${
-                            msg.sender === "freelancer"
-                              ? "justify-end"
-                              : "justify-start"
+                            msg.fromSelf ? "justify-end" : "justify-start"
                           }`}
                         >
                           <div
                             className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
-                              msg.sender === "freelancer"
+                              msg.fromSelf
                                 ? "bg-blue-500 text-white rounded-br-none"
                                 : "bg-white border border-gray-200 text-gray-800 rounded-bl-none"
                             }`}

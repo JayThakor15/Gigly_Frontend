@@ -63,10 +63,9 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
   };
   // Chat Open Function
   const handleChatOpen = () => {
-    console.log();
 
-    if (window.startGlobalChat && gig?.userId?._id && gig?.userId?.username) {
-      window.startGlobalChat(gig.userId._id, gig.userId.username);
+    if (window.startGlobalChat && gig?.userId?._id && gig?.userId?.username &&gig?.freelancerId?.avatar) {
+      window.startGlobalChat(gig.userId._id, gig.userId.username,gig?.freelancerId?.avatar);
     } else {
       toast.error("Failed to start chat.");
     }
@@ -83,6 +82,7 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
   if (!gig) {
     return null;
   }
+  console.log(gig);
 
   const avatarUrl =
     gig?.freelancerId?.avatar ||
