@@ -5,7 +5,8 @@ import Freelancers from "../../components/Freelancers";
 import Footer from "../../components/Footer";
 import { useNavigate } from "react-router-dom";
 import MagicContainer from "../../../component/magic card/magiccard";
-import SparklesText from './../../../component/sparktext/SparklesText';
+import SparklesText from "./../../../component/sparktext/SparklesText";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 import { useState } from "react";
 
@@ -37,62 +38,155 @@ const ClientDashboard = () => {
     <div className="relative min-h-screen">
       <Navbar />
       <div className="p-6">
-        <div className="relative flex flex-col items-center justify-center min-h-[80vh]">
-          <img
-            src="/Dashboard_bg.jpg"
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover opacity-60 -z-10 rounded-2xl"
-          />
-          <div className="mt-32 md:mt-40 flex flex-col items-center w-full px-4">
-            <h1 className="text-4xl md:text-6xl font-bold text-white text-center drop-shadow-lg">
-              Hello {user?.username}, Welcome to Giglyy
-              <span className="text-green-500">.</span>
-            </h1>
-            <WritingText
-              className="text-sm mt-5 md:text-3xl font-medium text-white text-center drop-shadow-lg"
-              text="Your one-stop platform for finding and hiring top freelance talent."
-              spacing={9}
-            />
-            <div className="mt-8 w-full max-w-2xl">
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  // Scroll to the Freelancers section on search
-                  const gigsSection = document.getElementById(
-                    "freelancer-gigs-section"
-                  );
-                  if (gigsSection) {
-                    gigsSection.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}
-                className="flex items-center bg-white/90 rounded-full shadow-lg px-4 py-2"
-              >
-                <span className="text-gray-400 text-2xl mr-2">🔍</span>
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search for services, skills, or freelancers..."
-                  className="flex-1 bg-transparent outline-none text-lg text-gray-700 placeholder-gray-400"
+        {/* Hero Section */}
+        <div className="relative overflow-hidden bg-white rounded-3xl shadow-xl border border-gray-100 min-h-[75vh]">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl  rounded-full blur-3xl opacity-30"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr  rounded-full blur-3xl opacity-30"></div>
+
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between h-full px-8 lg:px-16 py-16 lg:py-20">
+            {/* Left Content */}
+            <div className="flex-1 max-w-2xl text-center lg:text-left mb-12 lg:mb-0">
+              {/* Greeting */}
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm border border-gray-200 mb-6">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-sm font-medium text-gray-700">
+                  Hello, {user?.username || "Welcome"}
+                </span>
+              </div>
+
+              {/* Main Heading */}
+              <div className="flex items-center gap-2">
+                <h1 className="text-4xl lg:text-4xl font-bold text-gray-900 leading-tight">
+                  Welcome to{" "}
+                </h1>
+                <span className="text-4xl font-extrabold text-gray-800 flex items-center">
+                  <span
+                    className="mr-1"
+                    style={{
+                      fontFamily: "Montserrat, sans-serif",
+                      letterSpacing: "-2px",
+                    }}
+                  >
+                    Giglyy
+                  </span>
+                  <span className="ml-1 w-3 h-3 rounded-full bg-green-400 inline-block"></span>
+                </span>
+              </div>
+
+              {/* Subtitle */}
+              <div className="mb-8">
+                <WritingText
+                  className="text-lg lg:text-xl text-gray-600 leading-relaxed font-medium"
+                  text="Your one-stop platform for finding and hiring top freelance talent worldwide."
+                  spacing={12}
                 />
-                <button
-                  type="submit"
-                  className="ml-2 px-6 py-2 rounded-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold hover:from-green-600 hover:to-blue-600 transition"
+              </div>
+
+              {/* Stats or Features */}
+              <div className="flex flex-wrap justify-center lg:justify-start gap-6 mb-10">
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-blue-600 font-semibold">10k+</span>
+                  </div>
+                  <span>Freelancers</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                    <span className="text-green-600 font-semibold">5k+</span>
+                  </div>
+                  <span>Projects</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                    <span className="text-purple-600 font-semibold">99%</span>
+                  </div>
+                  <span>Satisfaction</span>
+                </div>
+              </div>
+
+              {/* Enhanced Search Bar */}
+              <div className="w-full max-w-2xl mx-auto lg:mx-0">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const gigsSection = document.getElementById(
+                      "freelancer-gigs-section"
+                    );
+                    if (gigsSection) {
+                      gigsSection.scrollIntoView({ behavior: "smooth" });
+                    }
+                  }}
+                  className="relative group"
                 >
-                  Search
-                </button>
-              </form>
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-green-500 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
+                  <div className="relative flex items-center bg-white rounded-2xl shadow-lg border border-gray-200 p-2 hover:shadow-xl transition-all duration-300">
+                    <div className="flex items-center justify-center w-12 h-12 bg-gray-50 rounded-xl mr-3">
+                      <svg
+                        className="w-5 h-5 text-gray-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search for services, skills, or freelancers..."
+                      className="flex-1 bg-transparent outline-none text-lg text-gray-700 placeholder-gray-400 py-3"
+                    />
+                    <button
+                      type="submit"
+                      className="px-8 py-3 bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-green-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                    >
+                      Search
+                    </button>
+                  </div>
+                </form>
+
+                {/* Popular Searches */}
+                <div className="mt-4 flex flex-wrap justify-center lg:justify-start gap-2">
+                  <span className="text-sm text-gray-500">Popular:</span>
+                  {[
+                    "Web Development",
+                    "UI/UX Design",
+                    "Content Writing",
+                    "Video Editing",
+                  ].map((tag) => (
+                    <button
+                      key={tag}
+                      onClick={() => setSearchQuery(tag)}
+                      className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors duration-200"
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className="mt-10 w-full max-w-3xl bg-white/80 rounded-xl shadow-lg p-8 flex flex-col items-center">
-              <h3 className="text-2xl font-bold text-green-700 mb-2 text-center">
-                Why choose Giglyy?
-              </h3>
-              <ul className="text-gray-700 text-lg space-y-2 text-center">
-                <li>✔️ 50+ categories to explore</li>
-                <li>✔️ Secure payments & trusted reviews</li>
-                <li>✔️ Connect with global talent instantly</li>
-                <li>✔️ 24/7 support for clients and freelancers</li>
-              </ul>
+
+            {/* Right Content - Animation */}
+            <div className="flex-shrink-0 w-full lg:w-auto lg:ml-12">
+              <div className="relative">
+                <div className="absolute inset-0 rounded-full blur-2xl opacity-20 animate-pulse"></div>
+                <div className="relative w-80 h-80 lg:w-96 lg:h-96 mx-auto">
+                  <DotLottieReact
+                    src="https://lottie.host/f8dbc0a1-5c77-4f62-b209-f4d94542cfa5/vPu8fi1fu1.lottie"
+                    loop
+                    autoplay
+                    className="w-full h-full"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -102,11 +196,11 @@ const ClientDashboard = () => {
         id="freelancer-gigs-section"
       >
         <SparklesText text="Freelancers" />
-       
+
         <div className="p-6">
-        <div className="bg-white rounded-2xl py-5 px-2">
-          <Freelancers searchQuery={searchQuery} />
-        </div>
+          <div className="bg-white rounded-2xl py-5 px-2">
+            <Freelancers searchQuery={searchQuery} />
+          </div>
         </div>
         <div className="flex flex-col justify-center items-center mt-5">
           <h1 className="text-4xl font-medium text-white mb-2 text-center">
@@ -173,7 +267,12 @@ const ClientDashboard = () => {
             {/* About Giglyy Section */}
             <div className="md:col-span-3 space-y-4 text-center md:text-left">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-800">
-                What is <span className="text-green-500">Giglyy</span>?
+                What is{" "}
+                <span className="text-gray-800 font-extrabold">
+                  Giglyy{" "}
+                  <span className="text-green-500 font-extrabold">.</span>
+                </span>
+                ?
               </h2>
               <p className="text-gray-600 text-lg">
                 Giglyy is a dynamic freelance marketplace designed to bridge the
@@ -211,7 +310,6 @@ const ClientDashboard = () => {
                         className="w-24 h-24 rounded-full border-4 border-white dark:border-gray-800 object-cover"
                       />
                     </div>
-
                     {/* User Info */}
                     <div className="text-left pt-2 mt-4">
                       <h2 className="text-2xl mt-10 font-bold text-gray-800 dark:text-gray-100">
@@ -225,12 +323,13 @@ const ClientDashboard = () => {
                         Generative AI Tinkerer | BTech CE Student
                       </p>
                     </div>
-
                     {/* Skills and Expertise */}
                     // add one seperator
                     <div className="border-t border-gray-200 dark:border-gray-700 mt-4"></div>
                     <div className="flex items-center justify-between mt-4">
-                     <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">Skills and Expertise</h1>
+                      <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+                        Skills and Expertise
+                      </h1>
                     </div>
                     <div className="flex flex-wrap gap-2 mt-2">
                       <span className="bg-gray-200 font-medium dark:bg-gray-700 text-[#364153] dark:text-gray-300 px-3 py-1 rounded-full text-lg">
@@ -248,8 +347,7 @@ const ClientDashboard = () => {
                       <span className="bg-gray-200 font-medium dark:bg-gray-700 text-[#364153] dark:text-gray-300 px-3 py-1 rounded-full text-lg">
                         Generative AI
                       </span>
-
-</div>
+                    </div>
                   </div>
                 </div>
               </MagicContainer>

@@ -92,7 +92,7 @@ const Navbar = () => {
               href="#contactus"
               className="hover:text-green-500 transition-colors cursor-pointer text-white"
             >
-              Contact
+              About Us
             </a>
           </li>
           {isLoggedIn && user?.role === "freelancer" ? (
