@@ -145,7 +145,7 @@ const GlobalChatWidget = () => {
                     className="w-8 h-8 rounded-full object-cover"
                   />
                   <div>
-                    <h3 className="font-semibold">Simran</h3>
+                    <h3 className="font-semibold">{receiverName}</h3>
                     <p className="text-xs text-gray-200">Freelancer</p>
                   </div>
                 </div>

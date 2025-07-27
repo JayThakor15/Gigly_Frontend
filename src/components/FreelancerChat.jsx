@@ -28,14 +28,24 @@ const FreelancerChat = () => {
       setIsConnected(true);
 
       socket.on("msg-receive", (data) => {
-        console.log("Received message:", data);
+        if (data.senderId === currentUserId) return;
         const newMessage = {
           senderId: data.senderId,
-          text: data.text || data.message, // Support both field names
+          text: data.text,
           timestamp: new Date(),
           fromSelf: false,
         };
-        setMessages((prev) => [...prev, newMessage]);
+
+        // Add message to current chat if it's from the selected client
+        if (selectedClient?.userId === data.senderId) {
+          setMessages((prev) => [...prev, newMessage]);
+        } else {
+          // Update unread count for other conversations
+          setUnreadCounts((prev) => ({
+            ...prev,
+            [data.senderId]: (prev[data.senderId] || 0) + 1,
+          }));
+        }
 
         // Add or update client in conversations list
         setConversations((prev) => {
@@ -48,7 +58,7 @@ const FreelancerChat = () => {
             const updated = [...prev];
             updated[existingClientIndex] = {
               ...updated[existingClientIndex],
-              lastMessage: data.text || data.message,
+              lastMessage: data.text,
               isOnline: true,
             };
             return updated;
@@ -60,24 +70,12 @@ const FreelancerChat = () => {
               avatar:
                 data.avatar ||
                 "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg",
-              lastMessage: data.text || data.message,
+              lastMessage: data.text,
               isOnline: true,
             };
             return [newClient, ...prev];
           }
         });
-
-        // Add message to current chat if it's from the selected client
-        if (String(selectedClient?.userId) === String(data.senderId)) {
-          console.log("Adding message to current chat");
-          setMessages((prev) => [...prev, newMessage]);
-        } else {
-          // Update unread count for other conversations
-          setUnreadCounts((prev) => ({
-            ...prev,
-            [data.senderId]: (prev[data.senderId] || 0) + 1,
-          }));
-        }
       });
 
       return () => {
@@ -86,7 +84,6 @@ const FreelancerChat = () => {
       };
     }
   }, [currentUserId, isOpen, selectedClient]);
-  
 
   const handleSend = () => {
     if (input.trim() === "" || !selectedClient) return;
@@ -101,7 +98,6 @@ const FreelancerChat = () => {
 
     // Send via socket
     socket.emit("send-msg", {
-      // senderUsername: senderUsername, // Added sender username
       senderId: currentUserId,
       receiverId: selectedClient.userId,
       text: input,
@@ -236,7 +232,7 @@ const FreelancerChat = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm text-gray-800 truncate">
-                          Jayuu
+                          {client.username}
                         </p>
                         <p className="text-xs text-gray-500 truncate">
                           {client.lastMessage}
@@ -292,7 +288,7 @@ const FreelancerChat = () => {
                   />
                   <div>
                     <p className="font-medium text-sm text-gray-800">
-                      Jayuu
+                      {selectedClient.username}
                     </p>
                     <p className="text-xs text-green-500">
                       {selectedClient.isOnline ? "Online" : "Offline"}
