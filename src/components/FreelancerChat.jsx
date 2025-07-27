@@ -8,12 +8,12 @@ const FreelancerChat = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [conversations, setConversations] = useState([]);
   const [selectedClient, setSelectedClient] = useState(null);
-  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [currentUserId, setCurrentUserId] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
   const [unreadCounts, setUnreadCounts] = useState({});
+  const [chatHistories, setChatHistories] = useState({});
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -36,15 +36,14 @@ const FreelancerChat = () => {
           fromSelf: false,
         };
 
-        // Add message to current chat if it's from the selected client
-        if (selectedClient?.userId === data.senderId) {
-          setMessages((prev) => [...prev, newMessage]);
-        } else {
-          // Update unread count for other conversations
-          setUnreadCounts((prev) => ({
-            ...prev,
-            [data.senderId]: (prev[data.senderId] || 0) + 1,
-          }));
+        setChatHistories((prev) => ({
+          ...prev,
+          [data.senderId]: [...(prev[data.senderId] || []), newMessage],
+        }));
+
+        // Reset unread count for other conversations
+        if (selectedClient?.userId !== data.senderId) {
+          setUnreadCounts((prev) => ({ ...prev, [data.senderId]: 0 }));
         }
 
         // Add or update client in conversations list
@@ -66,7 +65,7 @@ const FreelancerChat = () => {
             // Add new client to conversations
             const newClient = {
               userId: data.senderId,
-              username: data.senderUsername || `User ${data.senderId}`,
+              username: data.senderUsername,
               avatar:
                 data.avatar ||
                 "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg",
@@ -103,7 +102,6 @@ const FreelancerChat = () => {
       text: input,
     });
 
-    setMessages((prev) => [...prev, message]);
     setInput("");
   };
 
@@ -114,9 +112,11 @@ const FreelancerChat = () => {
   };
 
   const selectClient = (client) => {
-    console.log("Selecting client:", client);
     setSelectedClient(client);
-    console.log("Fetching messages for client:", client.userId);
+    setUnreadCounts((prev) => ({
+      ...prev,
+      [client.userId]: 0,
+    }));
     setShowAnimation(true);
     setTimeout(() => setShowAnimation(false), 2000);
   };
@@ -128,7 +128,7 @@ const FreelancerChat = () => {
   const closeChat = () => {
     setIsOpen(false);
     setSelectedClient(null);
-    setMessages([]);
+    setChatHistories({});
   };
 
   const getTotalUnreadCount = () => {
@@ -311,7 +311,7 @@ const FreelancerChat = () => {
                         Loading chat...
                       </p>
                     </div>
-                  ) : messages.length === 0 ? (
+                  ) : chatHistories[selectedClient.userId].length === 0 ? (
                     <div className="flex items-center justify-center h-full text-center">
                       <p className="text-gray-500 text-sm">
                         No messages yet. Start the conversation!
@@ -319,7 +319,7 @@ const FreelancerChat = () => {
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      {messages.map((msg, idx) => (
+                      {chatHistories[selectedClient.userId].map((msg, idx) => (
                         <div
                           key={idx}
                           className={`flex ${
