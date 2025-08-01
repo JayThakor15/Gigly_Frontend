@@ -63,7 +63,7 @@ const OrderModal = ({
           <strong>Placed On:</strong>{" "}
           {new Date(order.createdAt).toLocaleString()}
         </div>
- 
+
         <div className="mt-6 gap-5 flex justify-end">
           {order.status === "processing" && (
             <Button
@@ -75,7 +75,26 @@ const OrderModal = ({
           )}
           <Button
             variant="outline"
-            onClick={() => alert("Chat feature coming soon!")}
+            onClick={async () => {
+              // Save client to DB
+              await API.post("/chat/conversations/add-client", {
+                userId: order.userId._id,
+                username: order.userId.username,
+                avatar:
+                  order.userId.avatar ||
+                  "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg",
+              });
+
+              // Open chat widget with this client (calls the exposed function in GlobalChatWidget)
+              if (window && window.startGlobalChat) {
+                window.startGlobalChat(
+                  order.userId._id,
+                  order.userId.username,
+                  order.userId.avatar ||
+                    "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg"
+                );
+              }
+            }}
           >
             Chat with Client
           </Button>

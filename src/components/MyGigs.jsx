@@ -13,8 +13,8 @@ const MyGigs = () => {
     setLoading(true);
     try {
       const res = await API.get("/gigs/my-gigs");
-      setMyGigs(res.data);
-      console.log(res.data);
+      setMyGigs(res.data);  
+      
     } catch (err) {
       console.error(err);
     } finally {

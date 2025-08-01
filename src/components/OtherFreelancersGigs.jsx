@@ -10,7 +10,6 @@ const OtherFreelancersGigs = () => {
     try {
       const res = await API.get("/gigs/others");
       setOtherFreelancersGigs(res.data);
-      console.log(res.data);
     } catch (err) {
       console.error(err);
     } finally {

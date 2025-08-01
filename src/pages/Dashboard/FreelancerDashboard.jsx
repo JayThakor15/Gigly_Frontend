@@ -19,8 +19,6 @@ const categories = [
 const FreelancerDashboard = () => {
   const navigate = useNavigate(); // Import useNavigate from react-router-dom
   const [user, setuser] = useState(null);
-  console.log(user);
-
   // Add useEffect to check for token
   useEffect(() => {
     const token = localStorage.getItem("token");

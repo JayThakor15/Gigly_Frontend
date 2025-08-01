@@ -34,7 +34,9 @@ const FreelancerChat = () => {
           message: data.message,
           timestamp: new Date(),
           fromSelf: false,
+          isOnline: true,
         };
+        selectedClient.isOnline=true;
 
         setChatHistories((prev) => ({
           ...prev,
@@ -53,12 +55,12 @@ const FreelancerChat = () => {
           );
 
           if (existingClientIndex >= 0) {
-            // Update existing client's last message
+            // Update existing client's last message and set isOnline to true
             const updated = [...prev];
             updated[existingClientIndex] = {
               ...updated[existingClientIndex],
               lastMessage: data.message,
-              isOnline: true,
+              isOnline: true, // <-- Always set online when message received
             };
             return updated;
           } else {
@@ -70,8 +72,14 @@ const FreelancerChat = () => {
                 data.avatar ||
                 "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg",
               lastMessage: data.message,
-              isOnline: true,
+              isOnline: true, // <-- Always set online when message received
             };
+            // Add new client to the database
+            API.post("/chat/conversations/add-client", {
+              userId: newClient.userId,
+              username: newClient.username,
+              avatar: newClient.avatar,
+            });
             return [newClient, ...prev];
           }
         });
@@ -84,25 +92,46 @@ const FreelancerChat = () => {
     }
   }, [currentUserId, isOpen, selectedClient]);
 
+  useEffect(() => {
+    if (isOpen) {
+      // Fetch clients from backend when chat is opened
+      API.get("/chat/conversations/clients")
+        .then((res) => {
+          setConversations(res.data);
+        })
+        .catch((err) => {
+          console.error("Failed to fetch clients:", err);
+        });
+    }
+  }, [isOpen]);
+
   const handleSend = async () => {
     if (input.trim() === "" || !selectedClient) return;
 
+    // Get freelancer details from backend
+    const freelancerId = JSON.parse(localStorage.getItem("user"));
+    const freelancer = await API.get(`/freelancers/${freelancerId.id}`);
+
+    const avatar = freelancer?.data?.avatar;
+
     const newMessage = {
-      fromSelf: true,
-      message: input.trim(),
+      senderUsername: freelancer?.data?.username,
       senderId: currentUserId,
       receiverId: selectedClient.userId,
-      timestamp: new Date(),
+      message: input.trim(),
+      avatar: avatar,
+      fromSelf: true, // <-- Add this
     };
 
-    // Send via socket
+    // Send via socket (use correct properties)
     socket.emit("send-msg", {
+      senderUsername: freelancer?.data?.username, // <-- fix here
+      avatar: freelancer?.data?.avatar, // <-- fix here
       senderId: currentUserId,
       receiverId: selectedClient.userId,
       message: input.trim(),
     });
 
-    // Update local chat history immediately
     setChatHistories((prev) => ({
       ...prev,
       [selectedClient.userId]: [
@@ -127,6 +156,11 @@ const FreelancerChat = () => {
       [client.userId]: 0,
     }));
     setShowAnimation(true);
+    // Reset chat history for this client to empty (no messages)
+    setChatHistories((prev) => ({
+      ...prev,
+      [client.userId]: [],
+    }));
     setTimeout(() => setShowAnimation(false), 2000);
   };
 
@@ -143,6 +177,13 @@ const FreelancerChat = () => {
   const getTotalUnreadCount = () => {
     return Object.values(unreadCounts).reduce((sum, count) => sum + count, 0);
   };
+
+  useEffect(() => {
+    window.startGlobalChat = toggleChat;
+    return () => {
+      delete window.startGlobalChat;
+    };
+  }, []);
 
   return (
     <>
@@ -300,6 +341,7 @@ const FreelancerChat = () => {
                       {selectedClient.username}
                     </p>
                     <p className="text-xs text-green-500">
+                     
                       {selectedClient.isOnline ? "Online" : "Offline"}
                     </p>
                   </div>
