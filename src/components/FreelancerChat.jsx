@@ -27,11 +27,11 @@ const FreelancerChat = () => {
       socket.emit("addUser", currentUserId);
       setIsConnected(true);
 
-      socket.on("msg-receive", (data) => {
+      socket.on("msg-receive", async (data) => {
         if (data.senderId === currentUserId) return;
         const newMessage = {
           senderId: data.senderId,
-          text: data.text,
+          message: data.message,
           timestamp: new Date(),
           fromSelf: false,
         };
@@ -57,7 +57,7 @@ const FreelancerChat = () => {
             const updated = [...prev];
             updated[existingClientIndex] = {
               ...updated[existingClientIndex],
-              lastMessage: data.text,
+              lastMessage: data.message,
               isOnline: true,
             };
             return updated;
@@ -69,7 +69,7 @@ const FreelancerChat = () => {
               avatar:
                 data.avatar ||
                 "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg",
-              lastMessage: data.text,
+              lastMessage: data.message,
               isOnline: true,
             };
             return [newClient, ...prev];
@@ -84,12 +84,12 @@ const FreelancerChat = () => {
     }
   }, [currentUserId, isOpen, selectedClient]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (input.trim() === "" || !selectedClient) return;
 
-    const message = {
+    const newMessage = {
       fromSelf: true,
-      text: input,
+      message: input.trim(),
       senderId: currentUserId,
       receiverId: selectedClient.userId,
       timestamp: new Date(),
@@ -99,8 +99,17 @@ const FreelancerChat = () => {
     socket.emit("send-msg", {
       senderId: currentUserId,
       receiverId: selectedClient.userId,
-      text: input,
+      message: input.trim(),
     });
+
+    // Update local chat history immediately
+    setChatHistories((prev) => ({
+      ...prev,
+      [selectedClient.userId]: [
+        ...(prev[selectedClient.userId] || []),
+        newMessage,
+      ],
+    }));
 
     setInput("");
   };
@@ -111,7 +120,7 @@ const FreelancerChat = () => {
     }
   };
 
-  const selectClient = (client) => {
+  const selectClient = async (client) => {
     setSelectedClient(client);
     setUnreadCounts((prev) => ({
       ...prev,
@@ -297,7 +306,7 @@ const FreelancerChat = () => {
                 </div>
 
                 {/* Messages Area */}
-                <div className="flex-1 p-3 overflow-y-auto bg-gray-50">
+                <div className="flex-1 p-3 overflow-y-auto bg-gradient-to-b from-gray-50 to-white">
                   {showAnimation ? (
                     <div className="flex flex-col items-center justify-center h-full">
                       <div className="w-30 h-30 mb-2">
@@ -333,7 +342,7 @@ const FreelancerChat = () => {
                                 : "bg-white border border-gray-200 text-gray-800 rounded-bl-none"
                             }`}
                           >
-                            {msg.text}
+                            {msg.message}
                           </div>
                         </div>
                       ))}

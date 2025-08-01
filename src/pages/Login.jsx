@@ -29,7 +29,7 @@ export default function Login() {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data));
       toast.success("Login successful!");
-      setTimeout(() => navigate("/dashboard"), 1000); // Delay for toast visibility
+      navigate("/dashboard");
     } catch (err) {
       toast.error(
         err.response?.data?.message ||

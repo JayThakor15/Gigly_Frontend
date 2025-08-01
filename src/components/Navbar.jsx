@@ -45,10 +45,12 @@ const Navbar = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userString = localStorage.getItem("user");
-    if (userString) {
+    if (token && userString) {
       setUser(JSON.parse(userString));
+    } else {
+      setUser(null);
     }
-
+   
     setIsLoggedIn(!!token);
   }, []);
 

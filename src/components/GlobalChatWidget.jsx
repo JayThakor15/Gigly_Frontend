@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import socket from "../utils/socket";
 import { Button } from "@/components/ui/button";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import API from "../utils/api";
 
 const GlobalChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,6 +15,8 @@ const GlobalChatWidget = () => {
   const [receiverAvatar, setReceiverAvatar] = useState(null); // Added state for receiver avatar
   const [isConnected, setIsConnected] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
+  const [conversationId, setConversationId] = useState(null); // Added state for conversation ID
+  const [newMessages, setNewMessages] = useState([]); // Added state for new messages
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -29,7 +32,16 @@ const GlobalChatWidget = () => {
       setIsConnected(true);
 
       socket.on("msg-receive", (data) => {
-        setMessages((prev) => [...prev, data]);
+        // Ensure data.message exists
+        console.log(data);
+        
+        setMessages((prev) => [
+          ...prev,
+          {
+            ...data,
+            message: data.message || data.text || "", // fallback if property is named 'text'
+          },
+        ]);
       });
 
       return () => {
@@ -39,19 +51,25 @@ const GlobalChatWidget = () => {
     }
   }, [currentUserId, isOpen]);
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (text.trim() === "" || !receiverId) return;
 
     const message = {
+      conversationId,
       senderUsername,
       senderId: currentUserId,
       receiverId,
-      text,
+      message: text.trim(),
     };
 
-    socket.emit("send-msg", message);
-    setMessages((prev) => [...prev, message]);
-    setText("");
+    try {
+      const response = await API.post("/chat/message", message);
+      socket.emit("send-msg", message);
+      setMessages((prev) => [...prev, message]);
+      setText("");
+    } catch (error) {
+      console.error("Error sending message:", error.message);
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -80,12 +98,31 @@ const GlobalChatWidget = () => {
   };
 
   // Function to start a chat with a specific user (can be called from other components)
-  const startChat = (targetUserId, receiverName, receiverAvatar) => {
+  const startChat = async (targetUserId, receiverName, receiverAvatar) => {
     setShowAnimation(true);
     setReceiverId(targetUserId);
     setReceiverName(receiverName);
-    setReceiverAvatar(receiverAvatar); // Added set receiver avatar
+    setReceiverAvatar(receiverAvatar);
     setIsOpen(true);
+
+    try {
+      const conversationResponse = await API.post("/chat/conversation", {
+        senderId: currentUserId,
+        receiverId: targetUserId, // Use targetUserId instead of receiverId state
+      });
+
+      const newConversationId = conversationResponse.data._id;
+      setConversationId(newConversationId);
+
+      // Fetch messages using the new conversation ID directly
+      const messagesResponse = await API.get(
+        `/chat/messages/${newConversationId}`
+      );
+
+      setMessages(messagesResponse.data);
+    } catch (error) {
+      console.error("Error fetching chat messages:", error.message);
+    }
 
     // Hide animation after 2 seconds
     setTimeout(() => {
@@ -232,7 +269,7 @@ const GlobalChatWidget = () => {
                           : "bg-white border border-gray-200 text-gray-800 rounded-bl-none"
                       }`}
                     >
-                      {message.text}
+                      {message.message}
                     </div>
                   </div>
                 ))}
