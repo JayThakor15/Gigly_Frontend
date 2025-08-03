@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import Searchbar from "./Searchbar";
-import Buttons from "./Buttons";
 import CategoryBox from "./CategoryBox";
 
 const categories = [
@@ -169,15 +167,29 @@ const Hero = () => {
           Your vision, our freelancers
           <span className="text-green-500">.</span>
         </h1>
-        <Searchbar />
-        <div className="flex flex-wrap justify-center mt-4">
-          <Buttons buttonText="Web Developer" />
-          <Buttons buttonText="UI/UX Designer" />
-          <Buttons buttonText="Video Editor" />
-          <Buttons buttonText="Content Writer" />
+
+        {/* Professional Content Section */}
+        <div className="max-w-4xl mx-auto px-6 text-center space-y-6">
+          <p className="text-white text-lg md:text-xl font-medium drop-shadow-md leading-relaxed">
+            Connect with world-class freelancers who transform ideas into
+            reality. From cutting-edge web development to stunning visual
+            designs,
+            <span className="text-green-400 font-semibold">
+              {" "}
+              our platform bridges the gap
+            </span>{" "}
+            between ambitious projects and exceptional talent.
+          </p>
+
+          <div className="mt-12">
+            <p className="text-white/80 text-base md:text-lg italic leading-relaxed">
+              "Where innovation meets expertise, and dreams become digital
+              reality. Join thousands of successful collaborations that have
+              shaped the future of business."
+            </p>
+          </div>
         </div>
       </div>
-      {/* Category Boxes Carousel */}
       <div className="relative w-full mt-8 flex items-center justify-center">
         {/* Left Arrow */}
         <button

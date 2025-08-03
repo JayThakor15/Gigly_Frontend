@@ -59,10 +59,10 @@ const Navbar = () => {
   }, [location.pathname]);
 
   const handleLogout = () => {
+    navigate("/");
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setIsLoggedIn(false);
-    navigate("/");
   };
 
   return (
