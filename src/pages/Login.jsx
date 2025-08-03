@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../utils/validationSchema";
 import API from "../utils/api";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function Login() {
@@ -28,8 +28,15 @@ export default function Login() {
       const res = await API.post("/auth/login", data);
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data));
-      toast.success("Login successful!");
-      navigate("/dashboard");
+      if (res.data.role === "freelancer") {
+        toast.success("Login successful!");
+        navigate("/freelancerdashboard");
+      } else if (res.data.role === "client") {
+        toast.success("Login successful!");
+        navigate("/clientdashboard");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       toast.error(
         err.response?.data?.message ||

@@ -50,7 +50,7 @@ const Navbar = () => {
     } else {
       setUser(null);
     }
-   
+
     setIsLoggedIn(!!token);
   }, []);
 
@@ -91,7 +91,7 @@ const Navbar = () => {
           </li>
           <li>
             <a
-              href="#contactus"
+              href="#aboutus"
               className="hover:text-green-500 transition-colors cursor-pointer text-white"
             >
               About Us
@@ -115,7 +115,7 @@ const Navbar = () => {
                 <DropdownMenuContent className="w-56">
                   <DropdownMenuGroup>
                     {onProfile ? (
-                      <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                      <DropdownMenuItem onClick={() => navigate("/")}>
                         <Home className="mr-2 h-4 w-4" />
                         <span>Home</span>
                         <DropdownMenuShortcut>⇧⌘H</DropdownMenuShortcut>
@@ -132,7 +132,9 @@ const Navbar = () => {
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
-                    <DropdownMenuItem onClick={() => navigate("/freelancerorders")}>
+                    <DropdownMenuItem
+                      onClick={() => navigate("/freelancerorders")}
+                    >
                       <CreditCard className="mr-2 h-4 w-4" />
                       <span>Your Orders</span>
                       <DropdownMenuShortcut>⌘O</DropdownMenuShortcut>
@@ -170,7 +172,7 @@ const Navbar = () => {
                 <DropdownMenuContent className="w-56">
                   <DropdownMenuGroup>
                     {onProfile ? (
-                      <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                      <DropdownMenuItem onClick={() => navigate("/")}>
                         <Home className="mr-2 h-4 w-4" />
                         <span>Home</span>
                         <DropdownMenuShortcut>⇧⌘H</DropdownMenuShortcut>
@@ -258,10 +260,10 @@ const Navbar = () => {
             </li>
             <li>
               <a
-                href="#contactus"
+                href="#aboutus"
                 className="hover:text-green-500 transition-colors cursor-pointer"
               >
-                Contact
+                About Us
               </a>
             </li>
             <li>

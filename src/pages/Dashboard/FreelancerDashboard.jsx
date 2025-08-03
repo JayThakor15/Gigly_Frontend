@@ -71,7 +71,6 @@ const FreelancerDashboard = () => {
                     text="As a skilled freelancer, Giglyy helps you connect with clients who value your work. Showcase your gigs, manage your projects, and grow your freelancing career — all in one place."
                     spacing={12}
                   />
-
                 </div>
 
                 {/* Right side: Animation */}
@@ -126,7 +125,7 @@ const FreelancerDashboard = () => {
         </div>
       </div>
       {/* Professional Gigs Section */}
-      <div className="px-6 py-12">
+      <div className="px-6 py-12" id="services">
         {/* Your Gigs Section */}
         <div className="mb-16">
           <div className="text-center mb-10">

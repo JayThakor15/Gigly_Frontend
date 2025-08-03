@@ -26,7 +26,6 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/dashboard" element={<RolebasedDashboard />} />
           <Route path="/userprofile" element={<UserProfile />} />
           <Route path="/creategigs" element={<GigsCreation />} />
           <Route path="/clientdashboard" element={<ClientDashboard />} />

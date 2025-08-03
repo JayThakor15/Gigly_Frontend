@@ -154,7 +154,10 @@ const ClientDashboard = () => {
                 </form>
 
                 {/* Popular Searches */}
-                <div className="mt-4 flex flex-wrap justify-center lg:justify-start gap-2">
+                <div
+                  id="services"
+                  className="mt-4 flex flex-wrap justify-center lg:justify-start gap-2"
+                >
                   <span className="text-sm text-gray-500">Popular:</span>
                   {[
                     "Web Development",
@@ -261,7 +264,7 @@ const ClientDashboard = () => {
       </div>
 
       {/* About and Creator Section */}
-      <div className="p-6">
+      <div id="aboutus" className="p-6">
         <div className="py-20 rounded-2xl px-4 bg-white">
           <div className="max-w-5xl mx-auto grid md:grid-cols-5 gap-16 items-center">
             {/* About Giglyy Section */}
