@@ -109,6 +109,7 @@ const GlobalChatWidget = () => {
     setReceiverName(null);
     setReceiverAvatar(null);
     setShowAnimation(false);
+    setSelectedUser(null); // Reset selected user
   };
 
   // Function to start a chat with a specific user (can be called from other components)
@@ -119,6 +120,34 @@ const GlobalChatWidget = () => {
     setReceiverAvatar(receiverAvatar);
     setIsOpen(true);
     setMessages([]);
+
+
+
+    // Create or find the freelancer in conversations
+    const freelancerUser = {
+      userId: targetUserId,
+      username: receiverName,
+      avatar: receiverAvatar,
+      isOnline: true,
+    };
+
+    // Add to conversations if not already present
+    setConversations((prev) => {
+      if (prev.some((u) => u.userId === targetUserId)) {
+        return prev;
+      }
+      return [freelancerUser, ...prev];
+    });
+
+    // Set as selected user immediately
+    setSelectedUser(freelancerUser);
+
+    // Initialize chat history if not exists
+    setChatHistories((prev) => ({
+      ...prev,
+      [targetUserId]: prev[targetUserId] || [],
+    }));
+
     setTimeout(() => {
       setShowAnimation(false);
     }, 2000);
@@ -253,7 +282,21 @@ const GlobalChatWidget = () => {
                   </div>
                 </div>
                 <div className="flex-1 p-3 overflow-y-auto bg-gradient-to-b from-gray-50 to-white">
-                  {chatHistories[selectedUser.userId]?.length === 0 ? (
+                  {showAnimation ? (
+                    <div className="flex flex-col items-center justify-center h-full">
+                      <div className="w-30 h-30 mb-2">
+                        <DotLottieReact
+                          src="https://lottie.host/7b7c55f3-1ee2-4c0d-8b07-a16fb90b2cfd/Thaqq6vlCh.lottie"
+                          loop
+                          autoplay
+                        />
+                      </div>
+                      <p className="text-green-600 text-xs font-medium">
+                        Loading chat...
+                      </p>
+                    </div>
+                  ) : chatHistories[selectedUser.userId]?.length === 0 ||
+                    !chatHistories[selectedUser.userId] ? (
                     <div className="flex items-center justify-center h-full text-center">
                       <p className="text-gray-500 text-sm">
                         No messages yet. Start the conversation!

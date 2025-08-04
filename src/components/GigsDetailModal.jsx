@@ -61,12 +61,33 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
       toast.error("Failed to load reviews.");
     }
   };
-  // Chat Open Function
-  const handleChatOpen = () => {
 
-    if (window.startGlobalChat && gig?.userId?._id && gig?.userId?.username &&gig?.freelancerId?.avatar) {
-      window.startGlobalChat(gig.userId._id, gig.userId.username,gig?.freelancerId?.avatar);
+  // Chat Open Function - FIXED
+  const handleChatOpen = () => {
+    if (window.startGlobalChat && gig?.userId?._id) {
+      // Use the correct freelancer data
+      const freelancerId = gig.userId._id;
+      const freelancerUsername =
+        gig.freelancerId.username ||
+        gig.userId?.username ||
+        "Unknown Freelancer";
+      const freelancerAvatar =
+        gig.freelancerId.avatar ||
+        "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg?semt=ais_hybrid&w=740";
+
+      console.log("Starting chat with:", {
+        freelancerId,
+        freelancerUsername,
+        freelancerAvatar,
+      });
+
+      window.startGlobalChat(
+        freelancerId,
+        freelancerUsername,
+        freelancerAvatar
+      );
     } else {
+      console.error("Chat function not available or missing gig data");
       toast.error("Failed to start chat.");
     }
   };
@@ -82,14 +103,17 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
   if (!gig) {
     return null;
   }
-  console.log(gig);
+  console.log("Gig data:", gig);
 
   const avatarUrl =
     gig?.freelancerId?.avatar ||
     "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg?semt=ais_hybrid&w=740";
 
   // Ensure you're getting the freelancer's username from freelancerId
-  const username = gig?.userId?.username || "Unknown Freelancer";
+  const username =
+    gig?.freelancerId?.username ||
+    gig?.userId?.username ||
+    "Unknown Freelancer";
 
   const handleHireNow = async () => {
     try {
@@ -119,6 +143,7 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
       toast.error("Failed to create checkout session. Please try again later.");
     }
   };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl p-6 overflow-y-auto max-h-[90vh]">

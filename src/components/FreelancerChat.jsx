@@ -36,7 +36,7 @@ const FreelancerChat = () => {
           fromSelf: false,
           isOnline: true,
         };
-        selectedClient.isOnline=true;
+        selectedClient.isOnline = true;
 
         setChatHistories((prev) => ({
           ...prev,
@@ -341,7 +341,6 @@ const FreelancerChat = () => {
                       {selectedClient.username}
                     </p>
                     <p className="text-xs text-green-500">
-                     
                       {selectedClient.isOnline ? "Online" : "Offline"}
                     </p>
                   </div>

@@ -42,7 +42,7 @@ function App() {
           {/* Add other routes as needed */}
         </Routes>
 
-        {/* Global Chat Widget of client only */}
+        {/* Global Chat Widgets */}
         {user?.role === "client" && <GlobalChatWidget />}
         {user?.role === "freelancer" && <FreelancerChat />}
       </BrowserRouter>

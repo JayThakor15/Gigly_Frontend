@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react"; // Add useContext
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../utils/validationSchema";
 import API from "../utils/api";
 import { Link, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
+import { AuthContext } from "../context/authContext"; // Add this import
 
 export default function Login() {
+  const { setUser } = useContext(AuthContext); // Add this line
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -28,6 +30,7 @@ export default function Login() {
       const res = await API.post("/auth/login", data);
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data));
+      setUser(res.data); // Add this line to set the user in context
       if (res.data.role === "freelancer") {
         toast.success("Login successful!");
         navigate("/freelancerdashboard");
