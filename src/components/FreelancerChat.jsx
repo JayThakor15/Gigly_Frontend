@@ -110,7 +110,7 @@ const FreelancerChat = () => {
 
     // Get freelancer details from backend
     const freelancerId = JSON.parse(localStorage.getItem("user"));
-    const freelancer = await API.get(`/freelancers/${freelancerId.id}`);
+    const freelancer = await API.get(`/freelancers/`);
 
     const avatar = freelancer?.data?.avatar;
 

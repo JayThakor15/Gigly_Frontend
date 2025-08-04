@@ -11,6 +11,17 @@ const Sucesss = () => {
     const timer = setTimeout(() => setShowSuccessCard(true), 4000);
     return () => clearTimeout(timer);
   }, []);
+  const handleGotoHome = () => {
+    // after 4 seconds, navigate to home page
+    const user = JSON.parse(localStorage.getItem("user"));
+    setTimeout(() => {
+      if (user.role === "freelancer")
+        window.location.href = "/freelancerdashboard";
+      else if (user.role === "client") {
+        window.location.href = "/clientdashboard";
+      }
+    }, 4000);
+  };
 
   return (
     <>
@@ -61,7 +72,7 @@ const Sucesss = () => {
               Our order will show up in your orders page.
             </p>
             <button
-              onClick={() => (window.location.href = "/dashboard")}
+              onClick={handleGotoHome()}
               className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-full w-full"
             >
               Go to Dashboard

@@ -13,7 +13,7 @@ const GigsCreation = () => {
   const fetchAllGigs = async () => {
     setLoading(true);
     try {
-      const res = await API.get("/gigs");
+      const res = await API.get("/gigs/my-gigs");
       setGigs(res.data);
     } catch (err) {
       console.error(err);
@@ -67,34 +67,41 @@ const GigsCreation = () => {
                 return (
                   <div
                     key={gig._id}
-                    className="bg-gray-50 rounded-xl shadow-lg p-6 flex flex-col items-center w-full max-w-xs mx-auto hover:scale-105 transition-transform duration-300"
+                    className="group relative bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-100"
                   >
-                    {/* User Info */}
-                    <div className="flex items-center gap-3 mb-4">
+                    {/* Thumbnail */}
+                    <div className="relative overflow-hidden">
                       <img
-                        src={avatarUrl}
-                        alt={username}
-                        className="w-10 h-10 rounded-full object-cover border border-green-400"
+                        src={
+                          gig.thumbnail ||
+                          "https://via.placeholder.com/400x240?text=No+Image"
+                        }
+                        alt={gig.title}
+                        className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
                       />
-                      <p className="text-gray-800 font-medium">{username}</p>
+                      <div className="absolute top-4 right-4 bg-white text-black px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                        ${gig.price}
+                      </div>
+                      {gig.category && (
+                        <div className="absolute top-4 left-4 bg-white/90 text-gray-700 px-3 py-1 rounded-full text-xs font-medium shadow-md">
+                          {gig.category}
+                        </div>
+                      )}
                     </div>
 
-                    {/* Gig Thumbnail */}
-                    <img
-                      src={gig.thumbnail || "/default-thumbnail.jpg"}
-                      alt={gig.title}
-                      className="w-full h-40 object-cover rounded-lg mb-4"
-                    />
+                    {/* Card Content */}
+                    <div className="p-6 relative z-20">
+                      <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2">
+                        {gig.title}
+                      </h3>
+                      <p className="text-gray-600 text-sm line-clamp-3 mb-4">
+                        {gig.description}
+                      </p>
+                      <div className="flex gap-2"></div>
+                    </div>
 
-                    <h3 className="text-lg font-bold mb-2 text-gray-800 text-center">
-                      {gig.title}
-                    </h3>
-                    <p className="text-gray-600 text-sm text-center">
-                      {gig.description}
-                    </p>
-                    <span className="font-semibold mt-2">
-                      From: ${gig.price}
-                    </span>
+                    {/* Hover Effect */}
+                    <div className="absolute inset-0 border-2 border-green-400 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
                 );
               })}

@@ -22,7 +22,7 @@ export default function Register() {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data));
       toast.success("Registration successful!");
-      setTimeout(() => navigate("/dashboard"), 1000); // Delay for toast visibility
+      setTimeout(() => navigate("/login"), 1000); // Delay for toast visibility
     } catch (err) {
       toast.error(err.response?.data?.message || "Registration failed");
     }

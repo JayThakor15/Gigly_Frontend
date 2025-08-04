@@ -139,83 +139,167 @@ const servicesData = [
   },
 ];
 
-const VISIBLE_COUNT = 4;
-
 const Services = () => {
   const [serviceIdx, setServiceIdx] = useState(0);
+
+  // Responsive visible count based on screen size
+  const getVisibleCount = () => {
+    if (typeof window !== "undefined") {
+      if (window.innerWidth < 640) return 1; // Mobile: 1 card
+      if (window.innerWidth < 768) return 2; // Small tablet: 2 cards
+      if (window.innerWidth < 1024) return 3; // Tablet: 3 cards
+      return 4; // Desktop: 4 cards
+    }
+    return 4; // Default fallback
+  };
+
+  const [visibleCount, setVisibleCount] = useState(getVisibleCount());
+
+  // Update visible count on window resize
+  React.useEffect(() => {
+    const handleResize = () => {
+      setVisibleCount(getVisibleCount());
+      // Reset index if it's out of bounds
+      setServiceIdx((prev) =>
+        Math.min(prev, servicesData.length - getVisibleCount())
+      );
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleServiceScroll = (direction) => {
     if (direction === "left") {
       setServiceIdx((prev) => Math.max(prev - 1, 0));
     } else {
       setServiceIdx((prev) =>
-        Math.min(prev + 1, servicesData.length - VISIBLE_COUNT)
+        Math.min(prev + 1, servicesData.length - visibleCount)
       );
     }
   };
 
   const visibleServices = servicesData.slice(
     serviceIdx,
-    serviceIdx + VISIBLE_COUNT
+    serviceIdx + visibleCount
   );
 
   return (
-    <div className="w-full mt-12 flex flex-col items-center">
-      <h2 className="text-white text-2xl md:text-4xl font-medium drop-shadow-lg text-center mb-4">
+    <div className="w-full flex flex-col items-center">
+      <h2 className="text-white text-2xl md:text-4xl font-medium drop-shadow-lg text-center mb-8 md:mb-12">
         Popular Services
       </h2>
-      <div className="relative w-full flex items-center justify-center">
-        {/* Left Arrow */}
-        <button
-          className="absolute left-0 z-20 text-green-500 bg-white rounded-full shadow p-2 m-2 hover:bg-gray-100 transition disabled:opacity-50"
-          onClick={() => handleServiceScroll("left")}
-          aria-label="Scroll left"
-          disabled={serviceIdx === 0}
-        >
-          <svg
-            width="24"
-            height="24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-          >
-            <path d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        {/* Only show 4 service cards */}
-        <div className="flex gap-6 px-8">
-          {visibleServices.map((service, idx) => (
+
+      {/* Mobile: Stack cards vertically */}
+      <div className="block sm:hidden w-full px-4">
+        <div className="grid grid-cols-1 gap-6 max-w-sm mx-auto">
+          {servicesData.slice(0, 4).map((service, idx) => (
             <div
-              key={serviceIdx + idx}
-              className="bg-white/90 rounded-xl shadow-lg p-6 flex flex-col items-center w-64 hover:scale-105 transition"
+              key={idx}
+              className="bg-white/90 rounded-xl shadow-lg p-6 flex flex-col items-center hover:scale-105 transition-transform duration-300"
             >
               <div className="mb-4 text-green-500">{service.icon}</div>
-              <h3 className="text-lg font-semibold mb-2 text-gray-800">
+              <h3 className="text-lg font-semibold mb-2 text-gray-800 text-center">
                 {service.title}
               </h3>
-              <p className="text-gray-600 text-center">{service.description}</p>
+              <p className="text-gray-600 text-center text-sm">
+                {service.description}
+              </p>
             </div>
           ))}
         </div>
-        {/* Right Arrow */}
-        <button
-          className="absolute right-0 z-20 text-green-500 bg-white rounded-full shadow p-2 m-2 hover:bg-gray-100 transition disabled:opacity-50"
-          onClick={() => handleServiceScroll("right")}
-          aria-label="Scroll right"
-          disabled={serviceIdx >= servicesData.length - VISIBLE_COUNT}
-        >
-          <svg
-            width="24"
-            height="24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
+
+        {/* Show more button for mobile */}
+        {servicesData.length > 4 && (
+          <div className="text-center mt-6">
+            <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors">
+              View All Services
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Tablet and Desktop: Horizontal carousel */}
+      <div className="hidden sm:block w-full">
+        <div className="relative w-full flex items-center justify-center">
+          {/* Left Arrow */}
+          <button
+            className="absolute left-2 md:left-4 z-20 text-green-500 bg-white rounded-full shadow-lg p-2 hover:bg-gray-100 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => handleServiceScroll("left")}
+            aria-label="Scroll left"
+            disabled={serviceIdx === 0}
           >
-            <path d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
+            <svg
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          {/* Service Cards Container */}
+          <div className="overflow-hidden px-12 md:px-16">
+            <div className="flex gap-4 md:gap-6 transition-transform duration-300">
+              {visibleServices.map((service, idx) => (
+                <div
+                  key={serviceIdx + idx}
+                  className="bg-white/90 rounded-xl shadow-lg p-4 md:p-6 flex flex-col items-center flex-shrink-0 w-48 sm:w-52 md:w-64 hover:scale-105 transition-transform duration-300"
+                >
+                  <div className="mb-3 md:mb-4 text-green-500">
+                    {service.icon}
+                  </div>
+                  <h3 className="text-base md:text-lg font-semibold mb-2 text-gray-800 text-center">
+                    {service.title}
+                  </h3>
+                  <p className="text-gray-600 text-center text-sm md:text-base">
+                    {service.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Arrow */}
+          <button
+            className="absolute right-2 md:right-4 z-20 text-green-500 bg-white rounded-full shadow-lg p-2 hover:bg-gray-100 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => handleServiceScroll("right")}
+            aria-label="Scroll right"
+            disabled={serviceIdx >= servicesData.length - visibleCount}
+          >
+            <svg
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Pagination dots */}
+        <div className="flex justify-center mt-6 gap-2">
+          {Array.from({
+            length: Math.ceil(servicesData.length / visibleCount),
+          }).map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setServiceIdx(idx * visibleCount)}
+              className={`w-2 h-2 rounded-full transition-colors ${
+                Math.floor(serviceIdx / visibleCount) === idx
+                  ? "bg-green-500"
+                  : "bg-white/50 hover:bg-white/70"
+              }`}
+              aria-label={`Go to page ${idx + 1}`}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

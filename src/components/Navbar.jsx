@@ -2,23 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 import { UserRound } from "@/components/animate-ui/icons/user-round";
-("use client");
-
-import {
-  CreditCard,
-  Home,
-  Keyboard,
-  LogOut,
-  Mail,
-  MessageSquare,
-  Plus,
-  PlusCircle,
-  Settings,
-  User,
-  UserPlus,
-  Users,
-} from "lucide-react";
-import { motion } from "framer-motion"; // NOTE: your original was wrong
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -26,14 +10,11 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/animate-ui/radix/dropdown-menu";
+import { CreditCard, Home, LogOut, PlusCircle, User } from "lucide-react";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -42,6 +23,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [user, setUser] = useState(null);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userString = localStorage.getItem("user");
@@ -50,7 +32,6 @@ const Navbar = () => {
     } else {
       setUser(null);
     }
-
     setIsLoggedIn(!!token);
   }, []);
 
@@ -63,149 +44,99 @@ const Navbar = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setIsLoggedIn(false);
+    setMenuOpen(false);
   };
+
+  const navItems = [
+    { label: "Home", href: "#home" },
+    { label: "Services", href: "#services" },
+    { label: "About Us", href: "#aboutus" },
+  ];
+
+  const renderNavItems = (isMobile = false) => (
+    <>
+      {navItems.map((item) => (
+        <li key={item.label}>
+          <a
+            href={item.href}
+            className="hover:text-green-500 transition-colors cursor-pointer text-white"
+            onClick={() => isMobile && setMenuOpen(false)}
+          >
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </>
+  );
+
+  const renderUserMenu = () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="p-0 w-30 flex justify-center">
+          <AnimateIcon animateOnHover>
+            <div className="flex justify-center items-center gap-2">
+            <UserRound /> <p className="">Profile</p>
+            </div>
+          </AnimateIcon>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56">
+        <DropdownMenuGroup>
+          <DropdownMenuItem
+            onClick={() => navigate(onProfile ? "/" : "/userprofile")}
+          >
+            {onProfile ? (
+              <Home className="mr-2 h-4 w-4" />
+            ) : (
+              <User className="mr-2 h-4 w-4" />
+            )}
+            <span>{onProfile ? "Home" : "Profile"}</span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem
+            onClick={() =>
+              navigate(
+                user?.role === "freelancer"
+                  ? "/freelancerorders"
+                  : "/clientorders"
+              )
+            }
+          >
+            <CreditCard className="mr-2 h-4 w-4" />
+            <span>Your Orders</span>
+          </DropdownMenuItem>
+          {user?.role === "freelancer" && (
+            <DropdownMenuItem onClick={() => navigate("/creategigs")}>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              <span>My Gigs</span>
+            </DropdownMenuItem>
+          )}
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleLogout}>
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Logout</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 
   return (
     <>
       <nav className="p-4 flex items-center justify-between border-b border-white/20 shadow-md fixed w-full z-20 bg-white/10 backdrop-blur-md">
-        <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-1 text-white">
+        <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight flex items-center gap-1 text-white">
           Giglyy<span className="text-green-500">.</span>
         </h1>
+
         {/* Desktop Menu */}
         <ul className="hidden md:flex gap-8 font-medium items-center">
+          {renderNavItems()}
           <li>
-            <a
-              href="#home"
-              className="hover:text-green-500 transition-colors cursor-pointer text-white"
-            >
-              Home
-            </a>
-          </li>
-          <li>
-            <a
-              href="#services"
-              className="hover:text-green-500 transition-colors cursor-pointer text-white"
-            >
-              Services
-            </a>
-          </li>
-          <li>
-            <a
-              href="#aboutus"
-              className="hover:text-green-500 transition-colors cursor-pointer text-white"
-            >
-              About Us
-            </a>
-          </li>
-          {isLoggedIn && user?.role === "freelancer" ? (
-            <li>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" asChild>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <AnimateIcon animateOnHover>
-                        <UserRound />
-                      </AnimateIcon>
-                    </motion.button>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56">
-                  <DropdownMenuGroup>
-                    {onProfile ? (
-                      <DropdownMenuItem onClick={() => navigate("/")}>
-                        <Home className="mr-2 h-4 w-4" />
-                        <span>Home</span>
-                        <DropdownMenuShortcut>⇧⌘H</DropdownMenuShortcut>
-                      </DropdownMenuItem>
-                    ) : (
-                      <DropdownMenuItem
-                        onClick={() => navigate("/userprofile")}
-                      >
-                        <User className="mr-2 h-4 w-4" />
-                        <span>Profile</span>
-                        <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                      </DropdownMenuItem>
-                    )}
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem
-                      onClick={() => navigate("/freelancerorders")}
-                    >
-                      <CreditCard className="mr-2 h-4 w-4" />
-                      <span>Your Orders</span>
-                      <DropdownMenuShortcut>⌘O</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate("/creategigs")}>
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      <span>My Gigs</span>
-                      <DropdownMenuShortcut>⌘O</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Logout</span>
-                    <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </li>
-          ) : isLoggedIn && user?.role === "client" ? (
-            <li>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" asChild>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <AnimateIcon animateOnHover>
-                        <UserRound />
-                      </AnimateIcon>
-                    </motion.button>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56">
-                  <DropdownMenuGroup>
-                    {onProfile ? (
-                      <DropdownMenuItem onClick={() => navigate("/")}>
-                        <Home className="mr-2 h-4 w-4" />
-                        <span>Home</span>
-                        <DropdownMenuShortcut>⇧⌘H</DropdownMenuShortcut>
-                      </DropdownMenuItem>
-                    ) : (
-                      <DropdownMenuItem
-                        onClick={() => navigate("/userprofile")}
-                      >
-                        <User className="mr-2 h-4 w-4" />
-                        <span>Profile</span>
-                        <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-                      </DropdownMenuItem>
-                    )}
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem onClick={() => navigate("/clientorders")}>
-                      <CreditCard className="mr-2 h-4 w-4" />
-                      <span>Your Orders</span>
-                      <DropdownMenuShortcut>⌘O</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Logout</span>
-                    <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </li>
-          ) : (
-            <li>
+            {isLoggedIn ? (
+              renderUserMenu()
+            ) : (
               <button
                 className="bg-green-500 hover:bg-green-600 transition-colors text-white px-4 py-2 rounded-md shadow"
                 onClick={() =>
@@ -214,9 +145,10 @@ const Navbar = () => {
               >
                 Get Started
               </button>
-            </li>
-          )}
+            )}
+          </li>
         </ul>
+
         {/* Hamburger Icon */}
         <button
           className="md:hidden flex flex-col gap-1 focus:outline-none"
@@ -239,46 +171,40 @@ const Navbar = () => {
             }`}
           ></span>
         </button>
-        {/* Mobile Menu */}
-        {menuOpen && (
-          <ul className="absolute top-16 right-4 border rounded-lg shadow-lg flex flex-col gap-4 p-6 font-medium items-start md:hidden animate-fade-in">
-            <li>
-              <a
-                href="#home"
-                className="hover:text-green-500 transition-colors cursor-pointer"
-              >
-                Home
-              </a>
-            </li>
-            <li>
-              <a
-                href="#services"
-                className="hover:text-green-500 transition-colors cursor-pointer"
-              >
-                Services
-              </a>
-            </li>
-            <li>
-              <a
-                href="#aboutus"
-                className="hover:text-green-500 transition-colors cursor-pointer"
-              >
-                About Us
-              </a>
-            </li>
-            <li>
-              <button
-                className="bg-green-500 hover:bg-green-600 transition-colors text-white px-4 py-2 rounded-md shadow"
-                onClick={() =>
-                  document.getElementById("my_modal_5").showModal()
-                }
-              >
-                Get Started
-              </button>
-            </li>
-          </ul>
-        )}
       </nav>
+
+      {/* Mobile Menu */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-transparent bg-opacity-50"
+          onClick={() => setMenuOpen(false)}
+        >
+          <div
+            className="absolute top-16 right-0 w-64 bg-gray-800 shadow-lg rounded-l-lg p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ul className="flex flex-col gap-4 font-medium">
+              {renderNavItems(true)}
+              <li>
+                {isLoggedIn ? (
+                  renderUserMenu()
+                ) : (
+                  <button
+                    className="w-full bg-green-500 hover:bg-green-600 transition-colors text-black px-4 py-2 rounded-md shadow"
+                    onClick={() => {
+                      document.getElementById("my_modal_5").showModal();
+                      setMenuOpen(false);
+                    }}
+                  >
+                    Get Started
+                  </button>
+                )}
+              </li>
+            </ul>
+          </div>
+        </div>
+      )}
+
       {/* Spacer for fixed navbar */}
       <div className="h-16 md:h-20"></div>
     </>

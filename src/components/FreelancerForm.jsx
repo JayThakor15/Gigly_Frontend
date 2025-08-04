@@ -36,7 +36,6 @@ const languages = [
   "Telugu",
   "Bengali",
   "Kannada",
-  
 ];
 
 const FreelancerForm = ({ open, onOpenChange, freelancer, onSave }) => {
@@ -157,7 +156,6 @@ const FreelancerForm = ({ open, onOpenChange, freelancer, onSave }) => {
               type="number"
               value={formData.experience}
               onChange={(e) =>
-              
                 setFormData({ ...formData, experience: e.target.value })
               }
               placeholder="Years of experience"
