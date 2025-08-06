@@ -65,6 +65,8 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
 
   // Chat Open Function
   const handleChatOpen = () => {
+    console.log("Chat button clicked"); // Debug log
+
     if (window.startGlobalChat && gig?.userId?._id) {
       const freelancerId = gig.userId._id;
       const freelancerUsername =
@@ -74,6 +76,12 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
       const freelancerAvatar =
         gig.freelancerId?.avatar ||
         "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg?semt=ais_hybrid&w=740";
+
+      console.log("Starting chat with:", {
+        freelancerId,
+        freelancerUsername,
+        freelancerAvatar,
+      });
 
       window.startGlobalChat(
         freelancerId,
@@ -94,6 +102,9 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
       e.stopPropagation();
     }
 
+    console.log("🔥 STEP 1: Hire Now button clicked!");
+    console.log("🔥 STEP 2: Gig data:", gig);
+
     // Validate gig data first
     if (!gig) {
       console.error("❌ STEP 3a: Gig is null/undefined:", gig);
@@ -101,58 +112,99 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
       return;
     }
 
+    console.log("✅ STEP 3b: Gig exists, checking _id...");
+
     if (!gig._id) {
       console.error("❌ STEP 3c: Gig._id is missing:", gig._id);
       toast.error("Invalid gig data. Please try again.");
       return;
     }
 
+    console.log("✅ STEP 3d: Gig._id exists:", gig._id);
+
     setIsHiring(true); // Set loading state
+    console.log("🔥 STEP 4: Set isHiring to true");
 
     try {
       // Get user data from localStorage
       const userString = localStorage.getItem("user");
+      console.log("🔥 STEP 5: User string from localStorage:", userString);
 
       if (!userString) {
+        console.log("❌ STEP 5a: No user string found");
         toast.error("Please log in to hire a freelancer.");
         setIsHiring(false);
         return;
       }
 
+      console.log("✅ STEP 5b: User string found, parsing...");
+
       const user = JSON.parse(userString);
+      console.log("🔥 STEP 6: Parsed user data:", user);
 
       if (!user) {
+        console.log("❌ STEP 6a: User is null after parsing");
         toast.error("Invalid user data. Please log in again.");
         setIsHiring(false);
         return;
       }
+
+      console.log("✅ STEP 6b: User exists, checking user.id...");
 
       if (!user._id) {
+        console.log("❌ STEP 6c: User.id is missing:", user._id);
         toast.error("Invalid user data. Please log in again.");
         setIsHiring(false);
         return;
       }
 
-      // Validate required gig fields
+      console.log("✅ STEP 6d: User.id exists:", user._id);
 
+      // Validate required gig fields
+      console.log("🔥 STEP 7: Checking gig.price:", gig.price);
       if (!gig.price) {
+        console.log("❌ STEP 7a: Gig.price is missing");
         toast.error("Gig price is missing. Please contact support.");
         setIsHiring(false);
         return;
       }
 
+      console.log("✅ STEP 7b: Gig.price exists:", gig.price);
+
+      // Get freelancer data safely
+      console.log("🔥 STEP 8: Getting freelancer data...");
+      console.log("   gig.freelancerId:", gig.freelancerId);
+      console.log("   gig.userId:", gig.userId);
+
       const freelancerId = gig.freelancerId?._id || gig.userId?._id;
+      console.log("🔥 STEP 8a: Extracted freelancerId:", freelancerId);
 
       const freelancerName =
         gig.freelancerId?.username ||
         gig.userId?.username ||
         "Unknown Freelancer";
+      console.log("🔥 STEP 8b: Extracted freelancerName:", freelancerName);
 
       if (!freelancerId) {
+        console.log("❌ STEP 8c: FreelancerId is missing");
         toast.error("Freelancer information is missing.");
         setIsHiring(false);
         return;
       }
+
+      console.log("✅ STEP 8d: FreelancerId exists:", freelancerId);
+
+      console.log(
+        "🎉 STEP 9: All validations passed! Processing hire request:",
+        {
+          gigId: gig._id,
+          userId: user._id,
+          freelancerId: freelancerId,
+          price: gig.price,
+          gigTitle: gig.title,
+          freelancerName: freelancerName,
+        }
+      );
 
       // Store data in localStorage for checkout process
       localStorage.setItem("gigId", gig._id);
@@ -162,7 +214,7 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
       localStorage.setItem("freelancerName", freelancerName);
 
       // Create checkout session
-
+      console.log("Creating checkout session...");
       const checkoutData = {
         gig: {
           _id: gig._id,
@@ -177,10 +229,14 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
           gig.thumbnail || "https://via.placeholder.com/400x240?text=No+Image",
       };
 
+      console.log("Checkout data being sent:", checkoutData);
+
       const res = await API.post(
         "/checkout/create-checkout-session",
         checkoutData
       );
+
+      console.log("Checkout session created:", res.data);
 
       if (res.data && res.data.url) {
         // Redirect to Stripe Checkout

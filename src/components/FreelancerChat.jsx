@@ -24,6 +24,7 @@ const FreelancerChat = () => {
 
   useEffect(() => {
     if (currentUserId && isOpen) {
+   
       socket.emit("addUser", currentUserId);
       setIsConnected(true);
 
