@@ -39,6 +39,39 @@ const Navbar = () => {
     setonProfile(location.pathname === "/userprofile");
   }, [location.pathname]);
 
+  // Function to get role-based home route
+  const getRoleBasedHomeRoute = () => {
+    const userString = localStorage.getItem("user");
+    if (userString) {
+      try {
+        const userData = JSON.parse(userString);
+        const userRole = userData.role;
+
+        if (userRole === "freelancer") {
+          return "/freelancerDashboard";
+        } else if (userRole === "client") {
+          return "/clientDashboard";
+        }
+      } catch (error) {
+        console.error("Error parsing user data for navigation:", error);
+      }
+    }
+
+    // Default fallback route
+    return "/";
+  };
+
+  // Handle home navigation with role-based routing
+  const handleHomeNavigation = (isMobile = false) => {
+    const homeRoute = getRoleBasedHomeRoute();
+   
+    navigate(homeRoute);
+
+    if (isMobile) {
+      setMenuOpen(false);
+    }
+  };
+
   const handleLogout = () => {
     navigate("/");
     localStorage.removeItem("token");
@@ -47,9 +80,10 @@ const Navbar = () => {
     setMenuOpen(false);
   };
 
+  // Updated navItems - removed hardcoded href for Home
   const navItems = [
-    { label: "Home", href: "#home" },
-    { label: "Services", href: "#services" },
+    { label: "Home", action: "home" }, // Changed to action instead of href
+    { label: "Services", href: "/services" }, // You can update this route as needed
     { label: "About Us", href: "#aboutus" },
   ];
 
@@ -57,13 +91,24 @@ const Navbar = () => {
     <>
       {navItems.map((item) => (
         <li key={item.label}>
-          <a
-            href={item.href}
-            className="hover:text-green-500 transition-colors cursor-pointer text-white"
-            onClick={() => isMobile && setMenuOpen(false)}
-          >
-            {item.label}
-          </a>
+          {item.action === "home" ? (
+            // Special handling for Home navigation
+            <button
+              onClick={() => handleHomeNavigation(isMobile)}
+              className="hover:text-green-500 transition-colors cursor-pointer text-white bg-transparent border-none p-0 font-medium"
+            >
+              {item.label}
+            </button>
+          ) : (
+            // Regular navigation for other items
+            <a
+              href={item.href}
+              className="hover:text-green-500 transition-colors cursor-pointer text-white"
+              onClick={() => isMobile && setMenuOpen(false)}
+            >
+              {item.label}
+            </a>
+          )}
         </li>
       ))}
     </>
@@ -75,7 +120,7 @@ const Navbar = () => {
         <Button variant="outline" className="p-0 w-30 flex justify-center">
           <AnimateIcon animateOnHover>
             <div className="flex justify-center items-center gap-2">
-            <UserRound /> <p className="">Profile</p>
+              <UserRound /> <p className="">Profile</p>
             </div>
           </AnimateIcon>
         </Button>
@@ -83,7 +128,9 @@ const Navbar = () => {
       <DropdownMenuContent className="w-56">
         <DropdownMenuGroup>
           <DropdownMenuItem
-            onClick={() => navigate(onProfile ? "/" : "/userprofile")}
+            onClick={() =>
+              navigate(onProfile ? getRoleBasedHomeRoute() : "/userprofile")
+            }
           >
             {onProfile ? (
               <Home className="mr-2 h-4 w-4" />

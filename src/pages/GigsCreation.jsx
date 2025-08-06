@@ -8,7 +8,7 @@ const GigsCreation = () => {
   const [gigs, setGigs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
-  console.log(gigs);
+
 
   const fetchAllGigs = async () => {
     setLoading(true);

@@ -19,10 +19,9 @@ export default function Register() {
   const onSubmit = async (data) => {
     try {
       const res = await API.post("/auth/register", data);
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data));
-      toast.success("Registration successful!");
-      setTimeout(() => navigate("/login"), 1000); // Delay for toast visibility
+      setTimeout(
+        () => navigate("/verify-email", { state: { email: data.email } }),
+      ); // Delay for toast visibility
     } catch (err) {
       toast.error(err.response?.data?.message || "Registration failed");
     }

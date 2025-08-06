@@ -73,8 +73,6 @@ const OtherFreelancersGigs = () => {
                         ${freelancers.price || "2000"}
                       </span>
                     </div>
-
-                   
                   </div>
 
                   {/* Card Content */}

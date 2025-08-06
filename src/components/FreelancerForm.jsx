@@ -74,7 +74,7 @@ const FreelancerForm = ({ open, onOpenChange, freelancer, onSave }) => {
       });
       onSave(); // Let parent know to refresh
       onOpenChange(false);
-      console.log("Profile created successfully"); // Log success message
+      
     } catch (err) {
       console.error("Error updating freelancer profile:", err);
     } finally {

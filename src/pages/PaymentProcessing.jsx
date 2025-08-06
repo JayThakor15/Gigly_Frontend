@@ -16,7 +16,7 @@ const PaymentProcessing = () => {
       try {
         const user = JSON.parse(localStorage.getItem("user"));
         const res = await API.post("/orders/create-order", {
-          userId: user.id,
+          userId: user._id,
           stripeSessionId: sessionId,
           gigId: localStorage.getItem("gigId"),
           freelancerId: localStorage.getItem("freelancerId"),
@@ -25,7 +25,7 @@ const PaymentProcessing = () => {
           freelancerName: localStorage.getItem("freelancerName"),
         });
 
-        console.log("Order response:", res.data);
+      
         if (res.status === 201) {
           setStatus("success");
         } else {
@@ -45,7 +45,7 @@ const PaymentProcessing = () => {
     }
   }, [sessionId]);
   useEffect(() => {
-    console.log("Status:", status);
+    
     if (status === "success") {
       navigate("/success");
     }

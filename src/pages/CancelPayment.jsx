@@ -13,6 +13,17 @@ const CancelPayment = () => {
     const timer = setTimeout(() => setShowSuccessCard(true), 4000);
     return () => clearTimeout(timer);
   }, []);
+  const handleGotoHome = () => {
+    // after 4 seconds, navigate to home page
+    const user = JSON.parse(localStorage.getItem("user"));
+    setTimeout(() => {
+      if (user.role === "freelancer")
+        window.location.href = "/freelancerdashboard";
+      else if (user.role === "client") {
+        window.location.href = "/clientdashboard";
+      }
+    }, 4000);
+  };
 
   return (
     <>
@@ -65,7 +76,7 @@ const CancelPayment = () => {
               Please try again later.
             </p>
             <button
-              onClick={() => (window.location.href = "/dashboard")}
+              onClick={() => handleGotoHome()}
               className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200"
             >
               Go to Dashboard

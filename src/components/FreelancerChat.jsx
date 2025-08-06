@@ -17,8 +17,8 @@ const FreelancerChat = () => {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
-    if (user?.id && user?.role === "freelancer") {
-      setCurrentUserId(user.id);
+    if (user?._id && user?.role === "freelancer") {
+      setCurrentUserId(user._id);
     }
   }, []);
 

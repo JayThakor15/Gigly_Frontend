@@ -20,8 +20,8 @@ const GlobalChatWidget = () => {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
-    if (user?.id) {
-      setCurrentUserId(user.id);
+    if (user?._id) {
+      setCurrentUserId(user._id);
       setSenderUsername(user.username);
     }
   }, []);
@@ -120,8 +120,6 @@ const GlobalChatWidget = () => {
     setReceiverAvatar(receiverAvatar);
     setIsOpen(true);
     setMessages([]);
-
-
 
     // Create or find the freelancer in conversations
     const freelancerUser = {

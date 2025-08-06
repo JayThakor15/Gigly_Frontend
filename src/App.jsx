@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import ClientDashboard from "./pages/Dashboard/ClientDashboard";
 import UserProfile from "./pages/UserProfile";
@@ -16,13 +16,14 @@ import GlobalChatWidget from "./components/GlobalChatWidget";
 import { useContext } from "react";
 import { AuthContext } from "./context/authContext.jsx";
 import FreelancerChat from "./components/FreelancerChat.jsx";
+import EmailVerification from './pages/EmailVerification';
 
 function App() {
   const { user } = useContext(AuthContext);
 
   return (
     <div className="App">
-      <BrowserRouter>
+      <Router>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/userprofile" element={<UserProfile />} />
@@ -37,6 +38,7 @@ function App() {
           <Route path="/paymentprocessing" element={<PaymentProcessing />} />
           <Route path="/clientorders" element={<ClientOrders />} />
           <Route path="/freelancerorders" element={<FreelancerOrders />} />
+          <Route path="/verify-email" element={<EmailVerification />} />
 
           {/* Add other routes as needed */}
         </Routes>
@@ -44,7 +46,7 @@ function App() {
         {/* Global Chat Widgets */}
         {user?.role === "client" && <GlobalChatWidget />}
         {user?.role === "freelancer" && <FreelancerChat />}
-      </BrowserRouter>
+      </Router>
     </div>
   );
 }
