@@ -17,14 +17,13 @@ const FreelancerChat = () => {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
-    if (user?._id && user?.role === "freelancer") {
-      setCurrentUserId(user._id);
+    if (user?.id && user?.role === "freelancer") {
+      setCurrentUserId(user.id);
     }
   }, []);
 
   useEffect(() => {
     if (currentUserId && isOpen) {
-   
       socket.emit("addUser", currentUserId);
       setIsConnected(true);
 
