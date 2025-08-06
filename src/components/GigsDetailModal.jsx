@@ -151,7 +151,7 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
 
       console.log("✅ STEP 6b: User exists, checking user.id...");
 
-      if (!user._id) {
+      if (!user.id) {
         console.log("❌ STEP 6c: User.id is missing:", user.id);
         toast.error("Invalid user data. Please log in again.");
         setIsHiring(false);
