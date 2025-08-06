@@ -63,7 +63,7 @@ Frontend/
 │   │   └── Dashboard/           # Dashboard pages
 │   │       ├── ClientDashboard.jsx
 │   │       ├── FreelancerDashboard.jsx
-│   │       └── RolebasedDashboard.jsx
+│   │       
 │   ├── utils/                # Utility functions
 │   │   └── api.js               # API configuration
 │   ├── App.jsx               # Main app component
