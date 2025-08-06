@@ -152,13 +152,13 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
       console.log("✅ STEP 6b: User exists, checking user.id...");
 
       if (!user._id) {
-        console.log("❌ STEP 6c: User.id is missing:", user._id);
+        console.log("❌ STEP 6c: User.id is missing:", user.id);
         toast.error("Invalid user data. Please log in again.");
         setIsHiring(false);
         return;
       }
 
-      console.log("✅ STEP 6d: User.id exists:", user._id);
+      console.log("✅ STEP 6d: User.id exists:", user.id);
 
       // Validate required gig fields
       console.log("🔥 STEP 7: Checking gig.price:", gig.price);
@@ -176,7 +176,7 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
       console.log("   gig.freelancerId:", gig.freelancerId);
       console.log("   gig.userId:", gig.userId);
 
-      const freelancerId = gig.freelancerId?._id || gig.userId?._id;
+      const freelancerId = gig.freelancerId?._id || gig.userId?.id;
       console.log("🔥 STEP 8a: Extracted freelancerId:", freelancerId);
 
       const freelancerName =
@@ -198,7 +198,7 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
         "🎉 STEP 9: All validations passed! Processing hire request:",
         {
           gigId: gig._id,
-          userId: user._id,
+          userId: user.id,
           freelancerId: freelancerId,
           price: gig.price,
           gigTitle: gig.title,
@@ -223,7 +223,7 @@ const GigsDetailModal = ({ open, onClose, gig }) => {
           thumbnail: gig.thumbnail,
           freelancerId: freelancerId,
         },
-        userId: user._id,
+        userId: user.id,
         price: parseFloat(gig.price), // Ensure price is a number
         gigImg:
           gig.thumbnail || "https://via.placeholder.com/400x240?text=No+Image",
