@@ -8,7 +8,7 @@ import GigsCreation from "./pages/GigsCreation";
 import Sucesss from "./pages/Sucess";
 import CancelPayment from "./pages/CancelPayment";
 import PaymentProcessing from "./pages/PaymentProcessing";
-import ClientOrders from "./pages/clientOrders";
+import ClientOrders from "./pages/ClientOrders.jsx";
 import FreelancerOrders from "./pages/FreelancerOrders";
 import GlobalChatWidget from "./components/GlobalChatWidget";
 
@@ -16,7 +16,7 @@ import GlobalChatWidget from "./components/GlobalChatWidget";
 import { useContext } from "react";
 import { AuthContext } from "./context/authContext.jsx";
 import FreelancerChat from "./components/FreelancerChat.jsx";
-import EmailVerification from './pages/EmailVerification';
+import EmailVerification from "./pages/EmailVerification";
 
 function App() {
   const { user } = useContext(AuthContext);
