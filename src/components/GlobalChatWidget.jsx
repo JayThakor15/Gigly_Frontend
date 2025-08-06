@@ -20,7 +20,7 @@ const GlobalChatWidget = () => {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
-    if (user?._id) {
+    if (user?.id) {
       setCurrentUserId(user.id);
       setSenderUsername(user.username);
     }
